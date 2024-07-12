@@ -70,7 +70,7 @@ void greedy_cycle_breaker(const std::shared_ptr<Graph> &graph) {
     }
 
     int nextRight = -1;
-    int nextLeft = -1;
+    int nextLeft = 1;
 
     std::list<std::shared_ptr<Node>> maxNodes;
 
@@ -102,9 +102,7 @@ void greedy_cycle_breaker(const std::shared_ptr<Graph> &graph) {
         }
     };
 
-    // 1. 创建随机数生成器
-    std::random_device rd;   // 非确定性随机数生成器
-    std::mt19937 gen(rd());  // 使用 std::random_device 初始化 Mersenne Twister 引擎
+    std::mt19937 gen(2);
 
     auto chooseNodeWithMaxOutflow = [&](std::list<std::shared_ptr<Node>> nodeList) {
         std::uniform_int_distribution<> dist(0, nodeList.size() - 1);

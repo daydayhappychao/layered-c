@@ -18,6 +18,7 @@ public:
 private:
     std::shared_ptr<Graph> graph;
     std::unordered_map<std::shared_ptr<Node>, int> layer;
+    void layout(const std::shared_ptr<Graph> &graph);
 };
 }  // namespace GuiBridge
 #endif  // ELK_LAYERED_HPP

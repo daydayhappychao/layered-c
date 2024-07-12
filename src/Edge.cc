@@ -6,6 +6,7 @@
 #include "./opts/PortType.h"
 #include "./utils/GraphUtil.h"
 #include "Port.h"
+#include "math/KVectorChain.h"
 #include "nlohmann/json.hpp"
 #include "nlohmann/json_fwd.hpp"
 namespace GuiBridge {
@@ -13,12 +14,6 @@ namespace GuiBridge {
 Edge::Edge(const std::shared_ptr<Port> &src, const std::shared_ptr<Port> &dst) {
     this->src = src;
     this->dst = dst;
-}
-
-void Edge::init() {
-    auto ptr = shared_from_this();
-    src.lock()->addEdge(ptr);
-    dst.lock()->addEdge(ptr);
 }
 
 std::shared_ptr<Port> Edge::getSrc() { return src.lock(); }
@@ -48,6 +43,8 @@ void Edge::reverse(const std::shared_ptr<Graph> &layeredGraph, bool adaptPorts) 
 
     this->reversed = !this->reversed;
 }
+
+KVectorChain Edge::getBendPoints() { return bendPoints; }
 
 nlohmann::json Edge::json() {
     nlohmann::json res;

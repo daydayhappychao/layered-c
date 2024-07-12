@@ -1,5 +1,5 @@
-#ifndef GREEDY
-#define GREEDY
+#ifndef GREEDY_CYCLE_BREAKER_HPP
+#define GREEDY_CYCLE_BREAKER_HPP
 
 #include "../../Graph.h"
 
@@ -8,4 +8,4 @@ namespace GuiBridge {
 
 void greedy_cycle_breaker(const std::shared_ptr<Graph> &graph);
 }
-#endif  // GREEDY
+#endif  // GREEDY_CYCLE_BREAKER_HPP

@@ -1,3 +1,7 @@
+#include <iostream>
+#include <map>
+#include <memory>
+#include <ostream>
 #include "Edge.h"
 #include "Graph.h"
 #include "LayeredEnginee.h"
@@ -16,10 +20,10 @@ int main() {
 
     // 添加节点到图
     graph->addNode(node1);
-    graph->addNode(node2);
     graph->addNode(node3);
-    graph->addNode(node4);
+    graph->addNode(node2);
     graph->addNode(node5);
+    graph->addNode(node4);
 
     // 创建端口
     auto port1_1 = std::make_shared<Port>("a1");
@@ -52,12 +56,6 @@ int main() {
     auto edge4 = std::make_shared<Edge>(port4_2, port5_1);
     auto edge5 = std::make_shared<Edge>(port5_2, port3_1);
     auto edge6 = std::make_shared<Edge>(port3_2, port1_1);
-    edge1->init();
-    edge2->init();
-    edge3->init();
-    edge4->init();
-    edge5->init();
-    edge6->init();
 
     // 添加边到图
     graph->addEdge(edge1);
@@ -72,8 +70,9 @@ int main() {
     elkLayered.layered();
     // elkLayered.printLayers();
     elkLayered.printJson();
+    std::cout << "1112" << std::endl;
     return 0;
 }
 }  // namespace GuiBridge
 
-int main() { return GuiBridge::main(); }
+int main() { return main(); }

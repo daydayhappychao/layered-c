@@ -11,7 +11,7 @@ namespace GuiBridge {
 class Node;  // 前向声明
 class Edge;
 class Port {
-   public:
+public:
     explicit Port(std::string name);
 
     std::shared_ptr<Node> getNode();
@@ -25,12 +25,18 @@ class Port {
     void setInternalCollect(bool);
     bool getInternalCollect();
 
+    std::vector<std::shared_ptr<Port>> getConnectedPorts(); 
+    void addConnectedPort(const std::shared_ptr<Port> &port);
+
     nlohmann::json json();
 
-   private:
+private:
     std::string name;
     std::weak_ptr<Node> node;
     std::vector<std::weak_ptr<Edge>> edges;
+
+    std::vector<std::weak_ptr<Port>> connectedPorts;
+
     bool internal_collect = false;
     int x = 0;
     int y = 0;

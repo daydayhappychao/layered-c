@@ -18,7 +18,6 @@ void Port::addEdge(const std::shared_ptr<Edge> &edge) { edges.push_back(edge); }
 
 std::vector<std::shared_ptr<Edge>> Port::getEdges() {
     std::vector<std::shared_ptr<Edge>> res;
-    res.reserve(edges.size());
     for (const auto &edge : edges) {
         res.push_back(edge.lock());
     }
@@ -28,6 +27,16 @@ std::vector<std::shared_ptr<Edge>> Port::getEdges() {
 bool Port::getInternalCollect() { return internal_collect; }
 
 void Port::setInternalCollect(bool b) { internal_collect = b; }
+
+std::vector<std::shared_ptr<Port>> Port::getConnectedPorts() {
+    std::vector<std::shared_ptr<Port>> res;
+    for (const auto &p : connectedPorts) {
+        res.push_back(p.lock());
+    }
+    return res;
+}
+
+void Port::addConnectedPort(const std::shared_ptr<Port> &port) { connectedPorts.push_back(port); }
 
 std::string Port::getName() { return name; }
 

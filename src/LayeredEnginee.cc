@@ -7,6 +7,7 @@
 #include <utility>
 
 #include "./flow/p1_cycle_breaking/GreedyCycleBreaker.h"
+#include "./utils/ComponentsProcessor.h"
 #include "Graph.h"
 
 namespace GuiBridge {
@@ -15,16 +16,24 @@ using json = nlohmann::json;
 ELKLayered::ELKLayered(std::shared_ptr<Graph> graph) : graph(std::move(graph)) {}
 
 void ELKLayered::layered() {
-    // p1 cycle breaking
-    greedy_cycle_breaker(graph);
+    ComponentsProcessor componentsProcessor;
 
-    // p2 layer assignment
+    std::vector<Graph> components = componentsProcessor.split(graph);
 
-    // p3 crossing minimization
+    for (auto graph : components) {
+        std::shared_ptr<Graph> graphPtr(&graph);
 
-    // p4 node placement
+        // p1 cycle breaking
+        greedy_cycle_breaker(graphPtr);
 
-    // p5 edge routing
+        // p2 layer assignment
+
+        // p3 crossing minimization
+
+        // p4 node placement
+
+        // p5 edge routing
+    }
 }
 
 void ELKLayered::printLayers() {

@@ -47,8 +47,6 @@ std::vector<std::shared_ptr<Port>> Node::getAllPorts() {
     return allPorts;
 }
 
-std::optional<int> Node::getLayer() { return layer; }
-
 std::vector<std::shared_ptr<Edge>> Node::getEdges() {
     std::vector<std::shared_ptr<Edge>> nodeEdges;
     for (auto &port : inputPorts) {
@@ -67,10 +65,10 @@ std::vector<std::shared_ptr<Edge>> Node::getEdges() {
 nlohmann::json Node::json() {
     nlohmann::json res;
     res["name"] = name;
-    res["x"] = x;
-    res["y"] = y;
-    res["width"] = width;
-    res["height"] = height;
+    res["x"] = getPos().x;
+    res["y"] = getPos().y;
+    res["width"] = getSize().x;
+    res["height"] = getSize().y;
     return res;
 }
 }  // namespace GuiBridge
