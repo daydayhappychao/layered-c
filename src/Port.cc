@@ -5,6 +5,7 @@
 
 #include "Edge.h"
 #include "Node.h"
+#include "Shape.h"
 #include "nlohmann/json.hpp"
 
 namespace GuiBridge {

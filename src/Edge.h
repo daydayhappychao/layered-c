@@ -30,7 +30,7 @@ private:
     std::weak_ptr<Port> src;
     std::weak_ptr<Port> dst;
     std::string name;
-    KVectorChain bendPoints = KVectorChain();
+    KVectorChain bendPoints;
     bool reversed = false;
 };
 }  // namespace GuiBridge

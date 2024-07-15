@@ -13,8 +13,8 @@ using DfsDataType = std::pair<std::vector<std::shared_ptr<Node>>, std::set<PortT
 class ComponentsProcessor {
 public:
     ComponentsProcessor();
-    std::vector<Graph> split(const std::shared_ptr<Graph> &graph);
-    std::optional<DfsDataType> dfs(const std::shared_ptr<Node> &node, const std::optional<DfsDataType> &data);
+    std::vector<std::shared_ptr<Graph>> split(const std::shared_ptr<Graph> &graph);
+    std::optional<DfsDataType> dfs(const std::shared_ptr<Node> &node, std::optional<DfsDataType> &data);
     void combine(const std::vector<std::shared_ptr<Graph>> &components, const std::shared_ptr<Graph> &target);
 };
 }  // namespace GuiBridge

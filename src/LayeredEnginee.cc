@@ -17,14 +17,13 @@ ELKLayered::ELKLayered(std::shared_ptr<Graph> graph) : graph(std::move(graph)) {
 
 void ELKLayered::layered() {
     ComponentsProcessor componentsProcessor;
+    std::cout << "Node 123" << std::endl;
 
-    std::vector<Graph> components = componentsProcessor.split(graph);
+    auto components = componentsProcessor.split(graph);
 
     for (auto graph : components) {
-        std::shared_ptr<Graph> graphPtr(&graph);
-
         // p1 cycle breaking
-        greedy_cycle_breaker(graphPtr);
+        greedy_cycle_breaker(graph);
 
         // p2 layer assignment
 
@@ -34,6 +33,7 @@ void ELKLayered::layered() {
 
         // p5 edge routing
     }
+    componentsProcessor.combine(components, this->graph);
 }
 
 void ELKLayered::printLayers() {

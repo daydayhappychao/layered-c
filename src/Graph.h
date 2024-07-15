@@ -7,10 +7,12 @@
 #include "Edge.h"
 #include "Layer.h"
 #include "Node.h"
+#include "Shape.h"
 #include "math/KVector.h"
+
 namespace GuiBridge {
 
-class Graph {
+class Graph : public std::enable_shared_from_this<Graph>, public Shape {
 public:
     void addNode(const std::shared_ptr<Node> &node);
     void addEdge(const std::shared_ptr<Edge> &edge);

@@ -5,9 +5,15 @@
 
 #include "Layer.h"
 #include "Node.h"
+#include "Shape.h"
+
 namespace GuiBridge {
 
-void Graph::addNode(const std::shared_ptr<Node> &node) { nodes.push_back(node); }
+void Graph::addNode(const std::shared_ptr<Node> &node) {
+    nodes.push_back(node);
+    auto ptr = shared_from_this();
+    node->setGraph(ptr);
+}
 
 void Graph::addEdge(const std::shared_ptr<Edge> &edge) {
     edges.push_back(edge);
@@ -26,7 +32,7 @@ std::vector<std::shared_ptr<Edge>> &Graph::getEdges() { return edges; }
 std::vector<std::shared_ptr<Node>> Graph::getLayerlessNodes() {
     std::vector<std::shared_ptr<Node>> layerlessNodes;
     for (const auto &node : nodes) {
-        if (!node->getLayer().has_value()) {
+        if (node->getLayer() == nullptr) {
             layerlessNodes.push_back(node);
         }
     }
@@ -34,5 +40,8 @@ std::vector<std::shared_ptr<Node>> Graph::getLayerlessNodes() {
 }
 
 std::vector<std::shared_ptr<Layer>> &Graph::getLayers() { return layers; }
+
+KVector Graph::getSize() const { return size; };
+KVector Graph::getOffset() const { return offset; };
 
 }  // namespace GuiBridge

@@ -8,6 +8,7 @@
 
 #include "Edge.h"
 #include "Port.h"
+#include "Shape.h"
 #include "nlohmann/json.hpp"
 namespace GuiBridge {
 
@@ -61,6 +62,11 @@ std::vector<std::shared_ptr<Edge>> Node::getEdges() {
     }
     return nodeEdges;
 }
+
+std::shared_ptr<Layer> &Node::getLayer() { return layer; }
+
+std::shared_ptr<Graph> &Node::getGraph() { return graph; }
+void Node::setGraph(std::shared_ptr<Graph> &nextGraph) { graph = nextGraph; };
 
 nlohmann::json Node::json() {
     nlohmann::json res;

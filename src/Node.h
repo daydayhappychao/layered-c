@@ -28,6 +28,9 @@ public:
     std::vector<std::shared_ptr<Port>> &getOutputPorts();
     std::vector<std::shared_ptr<Port>> getAllPorts();
     std::vector<std::shared_ptr<Edge>> getEdges();
+    std::shared_ptr<Layer> &getLayer();
+    std::shared_ptr<Graph> &getGraph();
+    void setGraph(std::shared_ptr<Graph> &nextGraph);
 
     nlohmann::json json();
 
@@ -37,7 +40,7 @@ private:
     std::vector<std::shared_ptr<Port>> inputPorts;
     std::vector<std::shared_ptr<Port>> outputPorts;
     std::shared_ptr<Graph> graph;
-    std::shared_ptr<Layer> layer;
+    std::shared_ptr<Layer> layer = nullptr;
 };
 }  // namespace GuiBridge
 #endif  // NODE_HPP

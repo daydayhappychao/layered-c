@@ -1,6 +1,4 @@
 #include <iostream>
-#include <map>
-#include <memory>
 #include <ostream>
 #include "Edge.h"
 #include "Graph.h"
@@ -17,13 +15,15 @@ int main() {
     auto node3 = std::make_shared<Node>("c");
     auto node4 = std::make_shared<Node>("d");
     auto node5 = std::make_shared<Node>("e");
+    auto node6 = std::make_shared<Node>("f");
 
     // 添加节点到图
     graph->addNode(node1);
-    graph->addNode(node3);
     graph->addNode(node2);
-    graph->addNode(node5);
+    graph->addNode(node3);
     graph->addNode(node4);
+    graph->addNode(node5);
+    graph->addNode(node6);
 
     // 创建端口
     auto port1_1 = std::make_shared<Port>("a1");
@@ -36,6 +36,8 @@ int main() {
     auto port4_2 = std::make_shared<Port>("d2");
     auto port5_1 = std::make_shared<Port>("e1");
     auto port5_2 = std::make_shared<Port>("e2");
+    auto port6_1 = std::make_shared<Port>("f1");
+    auto port6_2 = std::make_shared<Port>("f2");
 
     // 添加端口到节点
     node1->addInputPort(port1_1);
@@ -48,14 +50,17 @@ int main() {
     node4->addOutputPort(port4_2);
     node5->addInputPort(port5_1);
     node5->addOutputPort(port5_2);
+    node6->addInputPort(port6_1);
+    node6->addOutputPort(port6_2);
 
     // 创建边
     auto edge1 = std::make_shared<Edge>(port1_2, port2_1);
     auto edge2 = std::make_shared<Edge>(port2_2, port3_1);
     auto edge3 = std::make_shared<Edge>(port3_2, port4_1);
     auto edge4 = std::make_shared<Edge>(port4_2, port5_1);
-    auto edge5 = std::make_shared<Edge>(port5_2, port3_1);
-    auto edge6 = std::make_shared<Edge>(port3_2, port1_1);
+    auto edge5 = std::make_shared<Edge>(port5_2, port6_1);
+    auto edge6 = std::make_shared<Edge>(port6_2, port4_1);
+    auto edge7 = std::make_shared<Edge>(port3_2, port1_1);
 
     // 添加边到图
     graph->addEdge(edge1);
@@ -64,6 +69,7 @@ int main() {
     graph->addEdge(edge4);
     graph->addEdge(edge5);
     graph->addEdge(edge6);
+    graph->addEdge(edge7);
 
     // 运行 ELK Layered 算法
     ELKLayered elkLayered(graph);
@@ -75,4 +81,4 @@ int main() {
 }
 }  // namespace GuiBridge
 
-int main() { return main(); }
+int main() { return GuiBridge::main(); }
