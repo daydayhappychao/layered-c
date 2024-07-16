@@ -1,4 +1,5 @@
 #include "KVector.h"
+#include <algorithm>
 #include <cmath>
 #include <exception>
 #include <regex>
@@ -31,7 +32,7 @@ KVector::KVector(double angle) {
     this->y = sin(angle);
 }
 
-KVector KVector::clone() { return KVector(this->x, this->y); }
+KVector KVector::clone() { return {this->x, this->y}; }
 
 std::string KVector::toString() { return "(" + std::to_string(this->x) + ", " + std::to_string(this->y) + ")"; }
 
@@ -102,9 +103,9 @@ KVector KVector::scale(double scale) {
     return *this;
 }
 
-KVector KVector::scale(double sx, double sy) {
-    this->x *= sx;
-    this->y *= sy;
+KVector KVector::scale(double scaleX, double scaleY) {
+    this->x *= scaleX;
+    this->y *= scaleY;
     return *this;
 }
 
@@ -142,11 +143,11 @@ double KVector::toRadians() {
     }
     if (x >= 0 && y >= 0) {
         return asin(y / length);
-    } else if (x < 0) {
-        return M_PI - asin(y / length);
-    } else {
-        return M_PI * 2 - asin(y / length);
     }
+    if (x < 0) {
+        return M_PI - asin(y / length);
+    }
+    return M_PI * 2 - asin(y / length);
 }
 
 void KVector::wiggle(std::mt19937 &random, double amount) {
@@ -219,13 +220,9 @@ void KVector::parse(std::string s) {
         throw std::runtime_error("The given string does not contain a valid number.");
     }
 }
-bool KVector::isdelim(char c, std::string delim) {
-    for (int i = 0; i < delim.length(); i++) {
-        if (c == delim[i]) {
-            return true;
-        }
-    }
-    return false;
+bool KVector::isdelim(char c, const std::string &delim) {
+    bool res = std::any_of(delim.begin(), delim.end(), [&c](char i) { return c == i; });
+    return res;
 }
 
 }  // namespace GuiBridge

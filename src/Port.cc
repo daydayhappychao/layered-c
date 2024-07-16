@@ -5,7 +5,6 @@
 
 #include "Edge.h"
 #include "Node.h"
-#include "Shape.h"
 #include "nlohmann/json.hpp"
 
 namespace GuiBridge {
@@ -19,6 +18,7 @@ void Port::addEdge(const std::shared_ptr<Edge> &edge) { edges.push_back(edge); }
 
 std::vector<std::shared_ptr<Edge>> Port::getEdges() {
     std::vector<std::shared_ptr<Edge>> res;
+    res.reserve(edges.size());
     for (const auto &edge : edges) {
         res.push_back(edge.lock());
     }
@@ -31,6 +31,7 @@ void Port::setInternalCollect(bool b) { internal_collect = b; }
 
 std::vector<std::shared_ptr<Port>> Port::getConnectedPorts() {
     std::vector<std::shared_ptr<Port>> res;
+    res.reserve(connectedPorts.size());
     for (const auto &p : connectedPorts) {
         res.push_back(p.lock());
     }

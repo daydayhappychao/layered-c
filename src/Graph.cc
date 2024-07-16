@@ -5,7 +5,6 @@
 
 #include "Layer.h"
 #include "Node.h"
-#include "Shape.h"
 
 namespace GuiBridge {
 

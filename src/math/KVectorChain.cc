@@ -1,4 +1,5 @@
 #include "KVectorChain.h"
+#include <algorithm>
 #include <cmath>
 #include <sstream>
 #include <string>
@@ -6,7 +7,7 @@
 #include "../utils/StringUtil.h"
 #include "./KVector.h"
 namespace GuiBridge {
-KVectorChain::KVectorChain() : std::vector<KVector>() {}
+KVectorChain::KVectorChain() = default;
 
 KVectorChain::KVectorChain(const std::vector<KVector> &collection) : std::vector<KVector>(collection) {}
 
@@ -50,7 +51,7 @@ void KVectorChain::parse(const std::string &string) {
         int xy = 0;
         double x = 0;
         double y = 0;
-        for (auto token : tokens) {
+        for (const auto &token : tokens) {
             if (trim(token).length() > 0) {
                 if (xy % 2 == 0) {
                     x = std::stod(token);
@@ -85,8 +86,9 @@ void KVectorChain::addAll(const std::vector<KVector> &vectors) { insert(end(), v
 
 void KVectorChain::addAllAsCopies(int index, const std::vector<KVector> &chain) {
     std::vector<KVector> copies;
+    copies.reserve(chain.size());
     for (const KVector &v : chain) {
-        copies.push_back(KVector(v));
+        copies.emplace_back(v);
     }
     insert(begin() + index, copies.begin(), copies.end());
 }
@@ -134,21 +136,15 @@ double KVectorChain::totalLength() const {
 }
 
 bool KVectorChain::hasNaN() const {
-    for (const KVector &v : *this) {
-        if (std::isnan(v.x) || std::isnan(v.y)) {
-            return true;
-        }
-    }
-    return false;
+    auto ins = *this;
+    bool res = std::any_of(ins.begin(), ins.end(), [](const KVector &v) { return std::isnan(v.x) || std::isnan(v.y); });
+    return res;
 }
 
 bool KVectorChain::hasInfinite() const {
-    for (const KVector &v : *this) {
-        if (std::isinf(v.x) || std::isinf(v.y)) {
-            return true;
-        }
-    }
-    return false;
+    auto ins = *this;
+    bool res = std::any_of(ins.begin(), ins.end(), [](const KVector &v) { return std::isinf(v.x) || std::isinf(v.y); });
+    return res;
 }
 
 KVector KVectorChain::pointOnLine(double dist) const {
@@ -175,32 +171,31 @@ KVector KVectorChain::pointOnLine(double dist) const {
                 currentPoint = nextPoint;
             }
             return currentPoint;
-        } else {
-            auto it = end();
-            KVector currentPoint = *--it;
-            while (it != begin()) {
-                double oldDistanceSum = distanceSum;
-                KVector nextPoint = *--it;
-                double additionalDistanceToNext = currentPoint.distance(nextPoint);
-                if (additionalDistanceToNext > 0) {
-                    distanceSum += additionalDistanceToNext;
-                    if (distanceSum >= absDistance) {
-                        double thisRelative = (absDistance - oldDistanceSum) / additionalDistanceToNext;
-                        KVector result = nextPoint.clone().sub(currentPoint);
-                        result.scale(thisRelative);
-                        result.add(currentPoint);
-                        return result;
-                    }
-                }
-                currentPoint = nextPoint;
-            }
-            return currentPoint;
         }
-    } else if (size() == 1) {
-        return front();
-    } else {
-        throw std::logic_error("Cannot determine a point on an empty vector chain.");
+        auto it = end();
+        KVector currentPoint = *--it;
+        while (it != begin()) {
+            double oldDistanceSum = distanceSum;
+            KVector nextPoint = *--it;
+            double additionalDistanceToNext = currentPoint.distance(nextPoint);
+            if (additionalDistanceToNext > 0) {
+                distanceSum += additionalDistanceToNext;
+                if (distanceSum >= absDistance) {
+                    double thisRelative = (absDistance - oldDistanceSum) / additionalDistanceToNext;
+                    KVector result = nextPoint.clone().sub(currentPoint);
+                    result.scale(thisRelative);
+                    result.add(currentPoint);
+                    return result;
+                }
+            }
+            currentPoint = nextPoint;
+        }
+        return currentPoint;
     }
+    if (size() == 1) {
+        return front();
+    }
+    throw std::logic_error("Cannot determine a point on an empty vector chain.");
 }
 
 double KVectorChain::angleOnLine(double dist) const {

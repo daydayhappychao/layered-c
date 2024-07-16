@@ -8,7 +8,7 @@ namespace GuiBridge {
 class KVectorChain : public std::vector<KVector> {
 public:
     KVectorChain();
-    KVectorChain(const std::vector<KVector> &collection);
+    explicit KVectorChain(const std::vector<KVector> &collection);
     KVectorChain(const std::initializer_list<KVector> &vectors);
 
     std::string toString() const;

@@ -10,7 +10,7 @@ public:
     KVector(double x, double y);
     KVector(const KVector &v);
     KVector(const KVector &start, const KVector &end);
-    KVector(double angle);
+    explicit KVector(double angle);
 
     KVector clone();
     std::string toString();
@@ -44,7 +44,7 @@ public:
     bool isNaN();
     bool isInfinite();
     void parse(std::string s);
-    bool isdelim(char c, std::string delim);
+    bool isdelim(char c, const std::string &delim);
     double x;
     double y;
 

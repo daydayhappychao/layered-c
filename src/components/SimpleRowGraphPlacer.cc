@@ -15,22 +15,23 @@ void combine(std::vector<std::shared_ptr<Graph>> &components, std::shared_ptr<Gr
             target->getSize().set(source->getSize());
         }
         return;
-    } else if (components.empty()) {
+    }
+    if (components.empty()) {
         target->getSize().set(0, 0);
         return;
     }
 
     sortComponents(components);
     std::shared_ptr<Graph> firstComponent = components[0];
-    double maxRowWidth = 0.0f;
-    double totalArea = 0.0f;
-    for (auto graph : components) {
+    double maxRowWidth = 0.0F;
+    double totalArea = 0.0F;
+    for (const auto &graph : components) {
         auto size = graph->getSize();
         maxRowWidth = std::max(maxRowWidth, size.x);
         totalArea += size.x * size.y;
     }
     maxRowWidth = std::max(maxRowWidth, sqrt(totalArea) * 1.3);
-    double componentSpacing = 20.0f;
+    double componentSpacing = 20.0F;
     placeComponents(components, target, maxRowWidth, componentSpacing);
     moveGraphs(target, components, 0, 0);
 }
@@ -38,10 +39,10 @@ void combine(std::vector<std::shared_ptr<Graph>> &components, std::shared_ptr<Gr
 void moveGraph(std::shared_ptr<Graph> &destGraph, std::shared_ptr<Graph> &sourceGraph, double offsetX, double offsetY) {
     KVector graphOffset = sourceGraph->getOffset().add(offsetX, offsetY);
 
-    for (auto node : sourceGraph->getLayerlessNodes()) {
+    for (const auto &node : sourceGraph->getLayerlessNodes()) {
         node->getPos().add(graphOffset);
-        for (auto port : node->getOutputPorts()) {
-            for (auto edge : port->getEdges()) {
+        for (const auto &port : node->getOutputPorts()) {
+            for (const auto &edge : port->getEdges()) {
                 edge->getBendPoints().offset(graphOffset);
             }
         }
@@ -57,15 +58,16 @@ void moveGraphs(std::shared_ptr<Graph> &destGraph, std::vector<std::shared_ptr<G
 }
 
 void sortComponents(std::vector<std::shared_ptr<Graph>> &components) {
-    std::sort(components.begin(), components.end(), [](std::shared_ptr<Graph> a, std::shared_ptr<Graph> b) {
-        auto size1 = a->getSize().x * a->getSize().y;
-        auto size2 = b->getSize().x * b->getSize().y;
-        return size1 >= size2;
-    });
+    std::sort(components.begin(), components.end(),
+              [](const std::shared_ptr<Graph> &a, const std::shared_ptr<Graph> &b) {
+                  auto size1 = a->getSize().x * a->getSize().y;
+                  auto size2 = b->getSize().x * b->getSize().y;
+                  return size1 >= size2;
+              });
 }
 
-void placeComponents(std::vector<std::shared_ptr<Graph>> &components, std::shared_ptr<Graph> target, double maxRowWidth,
-                     double componentSpacing) {
+void placeComponents(std::vector<std::shared_ptr<Graph>> &components, const std::shared_ptr<Graph> &target,
+                     double maxRowWidth, double componentSpacing) {
     double xpos = 0;
     double ypos = 0;
     double highestBox = 0;
@@ -88,10 +90,10 @@ void placeComponents(std::vector<std::shared_ptr<Graph>> &components, std::share
 
 void offsetGraph(std::shared_ptr<Graph> &graph, double offsetX, double offsetY) {
     auto graphOffset = KVector(offsetX, offsetY);
-    for (auto node : graph->getLayerlessNodes()) {
+    for (const auto &node : graph->getLayerlessNodes()) {
         node->getPos().add(graphOffset);
-        for (auto port : node->getOutputPorts()) {
-            for (auto edge : port->getEdges()) {
+        for (const auto &port : node->getOutputPorts()) {
+            for (const auto &edge : port->getEdges()) {
                 edge->getBendPoints().offset(graphOffset);
             }
         }

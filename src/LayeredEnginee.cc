@@ -21,7 +21,7 @@ void ELKLayered::layered() {
 
     auto components = componentsProcessor.split(graph);
 
-    for (auto graph : components) {
+    for (const auto &graph : components) {
         // p1 cycle breaking
         greedy_cycle_breaker(graph);
 

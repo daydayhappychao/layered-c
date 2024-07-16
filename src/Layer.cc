@@ -1,8 +1,9 @@
 #include "Layer.h"
 #include <algorithm>
+#include <utility>
 #include "Graph.h"
 namespace GuiBridge {
-Layer::Layer(std::shared_ptr<Graph> graph) : owner(graph), size() {}
+Layer::Layer(std::shared_ptr<Graph> graph) : owner(std::move(graph)) {}
 
 KVector &Layer::getSize() { return size; }
 
