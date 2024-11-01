@@ -15,13 +15,13 @@ namespace GuiBridge {
 void greedy_cycle_breaker(const std::shared_ptr<Graph> &graph) {
     auto nodes = graph->getLayerlessNodes();
 
-    std::vector<int> indeg;
-    std::vector<int> outdeg;
-    std::vector<int> mark;
+    int unprocessNodeCount = nodes.size();
+    std::vector<int> indeg(unprocessNodeCount);
+    std::vector<int> outdeg(unprocessNodeCount);
+    std::vector<int> mark(unprocessNodeCount);
     std::list<std::shared_ptr<Node>> sinks;
     std::list<std::shared_ptr<Node>> sources;
 
-    int unprocessNodeCount = nodes.size();
     int index = 0;
     for (const auto &node : nodes) {
         node->setId(index);
@@ -31,39 +31,24 @@ void greedy_cycle_breaker(const std::shared_ptr<Graph> &graph) {
                 if (edge->getSrc()->getNode() == node) {
                     continue;
                 }
-                if (index + 1 > indeg.size()) {
-                    indeg.resize(index + 1);
-                }
                 indeg[index] += 1;
             }
         }
 
         for (const auto &port : node->getOutputPorts()) {
-            if (port == nullptr) {
-                continue;
-            }
             for (const auto &edge : port->getEdges()) {
                 // self-loops edge
-                if (edge == nullptr) {
-                    std::cout << "xxxxxx" << std::endl;
+                if (edge->getDst()->getNode() == node) {
                     continue;
-                }
-                auto dst = edge->getDst();
-                auto originNode = dst->getNode();
-                if (originNode == node) {
-                    continue;
-                }
-                if (index + 1 > outdeg.size()) {
-                    outdeg.resize(index + 1);
                 }
                 outdeg[index] += 1;
             }
         }
 
         auto outdegSize = outdeg.size();
-        if (outdegSize > index && outdeg[index] == 0) {
+        if (outdeg[index] == 0) {
             sinks.push_back(node);
-        } else if (indeg.size() > index && indeg[index] == 0) {
+        } else if (indeg[index] == 0) {
             sources.push_back(node);
         }
         index++;
@@ -77,7 +62,7 @@ void greedy_cycle_breaker(const std::shared_ptr<Graph> &graph) {
     auto updateNeighbors = [&](const std::shared_ptr<Node> &node) {
         for (const auto &port : node->getAllPorts()) {
             for (const auto &edge : port->getEdges()) {
-                auto connectedPort = edge->getSrc() == port ? edge->getDst() : edge->getSrc();
+                auto connectedPort = edge->getOther(node);
                 auto endpoint = connectedPort->getNode();
 
                 // self-loops
@@ -102,7 +87,7 @@ void greedy_cycle_breaker(const std::shared_ptr<Graph> &graph) {
         }
     };
 
-    std::mt19937 gen(2);
+    std::mt19937 gen(10);
 
     auto chooseNodeWithMaxOutflow = [&](std::list<std::shared_ptr<Node>> nodeList) {
         std::uniform_int_distribution<> dist(0, nodeList.size() - 1);
@@ -133,9 +118,6 @@ void greedy_cycle_breaker(const std::shared_ptr<Graph> &graph) {
             int maxOutflow = std::numeric_limits<int>::min();
 
             for (const auto &node : nodes) {
-                if (mark.size() < node->getId() + 1) {
-                    mark.resize(node->getId() + 1);
-                }
                 if (mark[node->getId()] == 0) {
                     int outflow = outdeg[node->getId()] - indeg[node->getId()];
                     if (outflow >= maxOutflow) {

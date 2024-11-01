@@ -2,11 +2,15 @@
 #define PORT_TYPE_HPP
 namespace GuiBridge {
 
-enum PortType {
+enum class PortType {
     /** input port type. */
     INPUT,
     /** output port type. */
-    OUTPUT
+    OUTPUT,
+
 };
-}
+
+PortType opposedPortType(PortType type);
+
+}  // namespace GuiBridge
 #endif  // PORT_TYPE_HPP

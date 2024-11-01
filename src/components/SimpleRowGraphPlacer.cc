@@ -62,7 +62,7 @@ void sortComponents(std::vector<std::shared_ptr<Graph>> &components) {
               [](const std::shared_ptr<Graph> &a, const std::shared_ptr<Graph> &b) {
                   auto size1 = a->getSize().x * a->getSize().y;
                   auto size2 = b->getSize().x * b->getSize().y;
-                  return size1 >= size2;
+                  return size1 < size2;
               });
 }
 

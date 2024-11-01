@@ -28,6 +28,8 @@ public:
     std::vector<std::shared_ptr<Node>>::const_iterator begin() const;
     std::vector<std::shared_ptr<Node>>::const_iterator end() const;
     std::string toString() const;
+
+    int id;
 };
 }  // namespace GuiBridge
 #endif  // LAYER_H

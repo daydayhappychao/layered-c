@@ -9,6 +9,10 @@
 #include "./flow/p1_cycle_breaking/GreedyCycleBreaker.h"
 #include "./utils/ComponentsProcessor.h"
 #include "Graph.h"
+#include "flow/intermediate/LayerConstraintPostprocessor.h"
+#include "flow/intermediate/LayerConstraintPreprocessor.h"
+#include "flow/p2_layers/networkSimplex/NetworkSimplexLayerer.h"
+#include "flow/p3_crossing_minimization/LongEdgeSplitter.h"
 
 namespace GuiBridge {
 
@@ -17,23 +21,28 @@ ELKLayered::ELKLayered(std::shared_ptr<Graph> graph) : graph(std::move(graph)) {
 
 void ELKLayered::layered() {
     ComponentsProcessor componentsProcessor;
-    std::cout << "Node 123" << std::endl;
 
-    auto components = componentsProcessor.split(graph);
+    auto components = componentsProcessor.split(this->graph);
 
-    for (const auto &graph : components) {
-        // p1 cycle breaking
-        greedy_cycle_breaker(graph);
+    auto graph = components[0];
 
-        // p2 layer assignment
+    // p1 cycle breaking
+    greedy_cycle_breaker(graph);
 
-        // p3 crossing minimization
+    // p2 layer assignment
+    LayerConstraintPreprocessor layerConstraintPreprocessor;
+    layerConstraintPreprocessor.process(graph);
+    NetworkSimplexLayerer networkSimplexLayerer;
+    networkSimplexLayerer.process(graph);
+    LayerConstraintPostprocessor layerConstraintPostprocessor;
+    layerConstraintPostprocessor.process(graph);
 
-        // p4 node placement
+    // p3 crossing minimization
+    LongEdgeSplitter longEdgeSplitter;
+    longEdgeSplitter.process(graph);
+    // p4 node placement
 
-        // p5 edge routing
-    }
-    componentsProcessor.combine(components, this->graph);
+    // p5 edge routing
 }
 
 void ELKLayered::printLayers() {

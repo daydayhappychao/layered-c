@@ -1,11 +1,16 @@
 #include "Port.h"
 
+#include <algorithm>
+#include <memory>
 #include <string>
 #include <utility>
 
 #include "Edge.h"
+#include "Graph.h"
 #include "Node.h"
 #include "nlohmann/json.hpp"
+#include "opts/PortType.h"
+#include "utils/VectorUtil.h"
 
 namespace GuiBridge {
 
@@ -25,22 +30,44 @@ std::vector<std::shared_ptr<Edge>> Port::getEdges() {
     return res;
 }
 
+void Port::removeEdge(std::shared_ptr<Edge> &edge) {
+    auto it = edges.begin();
+    for (; it != edges.end();) {
+        if (it->lock() == edge) {
+            it = edges.erase(it);
+            return;
+        }
+    }
+};
+
 bool Port::getInternalCollect() { return internal_collect; }
 
 void Port::setInternalCollect(bool b) { internal_collect = b; }
 
 std::vector<std::shared_ptr<Port>> Port::getConnectedPorts() {
     std::vector<std::shared_ptr<Port>> res;
-    res.reserve(connectedPorts.size());
-    for (const auto &p : connectedPorts) {
-        res.push_back(p.lock());
+
+    auto ptr = shared_from_this();
+    for (auto &edge : node.lock()->getGraph()->getEdges()) {
+        if (edge->getSrc() == ptr) {
+            res.push_back(edge->getDst());
+        } else if (edge->getDst() == ptr) {
+            res.push_back(edge->getSrc());
+        }
     }
     return res;
 }
 
-void Port::addConnectedPort(const std::shared_ptr<Port> &port) { connectedPorts.push_back(port); }
-
 std::string Port::getName() { return name; }
+
+PortType Port::getType() {
+    const auto &thisPtr = shared_from_this();
+    auto &inputPorts = getNode()->getInputPorts();
+    if (vecInclude(inputPorts, thisPtr)) {
+        return PortType::INPUT;
+    }
+    return PortType::OUTPUT;
+}
 
 nlohmann::json Port::json() {
     nlohmann::json res;

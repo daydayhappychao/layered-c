@@ -7,17 +7,17 @@
 #include "../opts/PortType.h"
 namespace GuiBridge {
 
-std::shared_ptr<Port> provideCollectorPort(const std::shared_ptr<Graph> &graph,
-                                           const std::shared_ptr<Node> &node, PortType type) {
+std::shared_ptr<Port> provideCollectorPort(const std::shared_ptr<Graph> &graph, const std::shared_ptr<Node> &node,
+                                           PortType type) {
     switch (type) {
-        case INPUT:
+        case PortType::INPUT:
             for (auto inport : node->getInputPorts()) {
                 if (inport->getInternalCollect()) {
                     return inport;
                 }
             }
             break;
-        case OUTPUT:
+        case PortType::OUTPUT:
             for (auto inport : node->getOutputPorts()) {
                 if (inport->getInternalCollect()) {
                     return inport;
@@ -30,9 +30,9 @@ std::shared_ptr<Port> provideCollectorPort(const std::shared_ptr<Graph> &graph,
 
     std::shared_ptr<Port> ptr(&port);
 
-    if (type == INPUT) {
+    if (type == PortType::INPUT) {
         node->addInputPort(ptr);
-    } else if (type == OUTPUT) {
+    } else if (type == PortType::OUTPUT) {
         node->addOutputPort(ptr);
     }
     return ptr;
