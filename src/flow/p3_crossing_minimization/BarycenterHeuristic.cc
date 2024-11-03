@@ -11,8 +11,9 @@
 namespace GuiBridge {
 BarycenterState::BarycenterState(std::shared_ptr<Node> &node) : node(node) {}
 
-BarycenterHeuristic::BarycenterHeuristic(ForsterConstraintResolver *constraintResolver, std::mt19937 &random,
-                                         AbstractBarycenterPortDistributor *portDistributor,
+BarycenterHeuristic::BarycenterHeuristic(std::shared_ptr<ForsterConstraintResolver> &constraintResolver,
+                                         std::mt19937 &random,
+                                         std::shared_ptr<AbstractBarycenterPortDistributor> &portDistributor,
                                          const std::vector<std::vector<std::shared_ptr<Node>>> &graph)
     : constraintResolver(constraintResolver), random(random), portDistributor(portDistributor) {}
 

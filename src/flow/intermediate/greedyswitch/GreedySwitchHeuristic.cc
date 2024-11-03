@@ -80,7 +80,7 @@ void GreedySwitchHeuristic::initAtPortLevel(int l, int n, int p,
     nPorts++;
 }
 
-void GreedySwitchHeuristic::initAtLayerLevel(int l, const std::vector<std::vector<std::shared_ptr<Node>>> &nodeOrder) {
+void GreedySwitchHeuristic::initAtLayerLevel(int l, std::vector<std::vector<std::shared_ptr<Node>>> &nodeOrder) {
     nodeOrder[l][0]->getLayer()->id = l;
 }
 

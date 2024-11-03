@@ -3,6 +3,7 @@
 
 #include <memory>
 #include <vector>
+#include "Initializable.h"
 
 namespace GuiBridge {
 class Node;  // 前向声明
@@ -10,7 +11,7 @@ class Edge;
 class HyperedgeCrossingsCounter;
 class CrossingCounter;
 
-class AllCrossingsCounter {
+class AllCrossingsCounter : public Initializable {
 public:
     explicit AllCrossingsCounter(const std::vector<std::vector<std::shared_ptr<Node>>> &graph);
 
@@ -18,14 +19,14 @@ public:
     int countAllCrossings(const std::vector<std::vector<std::shared_ptr<Node>>> &currentOrder);
 
     // 节点级别初始化
-    void initAtNodeLevel(int l, int n, const std::vector<std::vector<std::shared_ptr<Node>>> &nodeOrder);
+    void initAtNodeLevel(int l, int n, std::vector<std::vector<std::shared_ptr<Node>>> &nodeOrder) override;
 
     // 端口级别初始化
-    void initAtPortLevel(int l, int n, int p, const std::vector<std::vector<std::shared_ptr<Node>>> &nodeOrder);
+    void initAtPortLevel(int l, int n, int p, std::vector<std::vector<std::shared_ptr<Node>>> &nodeOrder) override;
 
     // 边级别初始化
-    void initAtEdgeLevel(int l, int n, int p, int e, const std::shared_ptr<Edge> &edge,
-                         const std::vector<std::vector<std::shared_ptr<Node>>> &nodeOrder);
+    void initAtEdgeLevel(int l, int n, int p, int e, std::shared_ptr<Edge> &edge,
+                         std::vector<std::vector<std::shared_ptr<Node>>> &nodeOrder) override;
 
     // 遍历后初始化
     void initAfterTraversal();

@@ -16,6 +16,9 @@ public:
                                               int freeLayerIndex, bool isForwardSweep) = 0;
 };
 
+std::shared_ptr<ISweepPortDistributor> sweepPortDistributorCreate(
+    CrossMinType cmt, std::mt19937 &r, std::vector<std::vector<std::shared_ptr<Node>>> &currentOrder);
+
 }  // namespace GuiBridge
 
 #endif  // ISWEEP_PORT_DISTRIBUTOR_H

@@ -12,7 +12,9 @@
 #include "flow/intermediate/LayerConstraintPostprocessor.h"
 #include "flow/intermediate/LayerConstraintPreprocessor.h"
 #include "flow/p2_layers/networkSimplex/NetworkSimplexLayerer.h"
+#include "flow/p3_crossing_minimization/LayerSweepCrossingMinimizer.h"
 #include "flow/p3_crossing_minimization/LongEdgeSplitter.h"
+#include "opts/CrossMinType.h"
 
 namespace GuiBridge {
 
@@ -40,6 +42,10 @@ void ELKLayered::layered() {
     // p3 crossing minimization
     LongEdgeSplitter longEdgeSplitter;
     longEdgeSplitter.process(graph);
+    LayerSweepCrossingMinimizer layerSweepCrossingMinimizer(CrossMinType::BARYCENTER);
+    layerSweepCrossingMinimizer.process(graph);
+    LayerSweepCrossingMinimizer layerSweepCrossingMinimizer2(CrossMinType::TWO_SIDED_GREEDY_SWITCH);
+    layerSweepCrossingMinimizer2.process(graph);
     // p4 node placement
 
     // p5 edge routing

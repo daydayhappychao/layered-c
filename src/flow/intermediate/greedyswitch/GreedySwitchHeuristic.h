@@ -20,7 +20,7 @@ public:
     bool alwaysImproves() override;
     bool isDeterministic() override;
     void initAtPortLevel(int l, int n, int p, std::vector<std::vector<std::shared_ptr<Node>>> &nodeOrder) override;
-    void initAtLayerLevel(int l, const std::vector<std::vector<std::shared_ptr<Node>>> &nodeOrder) override;
+    void initAtLayerLevel(int l,  std::vector<std::vector<std::shared_ptr<Node>>> &nodeOrder) override;
     void initAfterTraversal() override;
 
 private:

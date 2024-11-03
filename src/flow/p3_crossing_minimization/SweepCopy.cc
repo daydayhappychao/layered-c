@@ -31,14 +31,15 @@ void SweepCopy::transferNodeAndPortOrdersToGraph(std::shared_ptr<Graph> &lGraph,
             auto &node = nodeOrder[i][j];
             node->setId(j);
             layers[i]->getNodes()[j] = node;
-            node->getPorts().clear();
-            node->getPorts().insert(node->getPorts().end(), portOrders[i][j].begin(), portOrders[i][j].end());
-        }
-    }
 
-    for (const auto &node : updatePortOrder) {
-        std::sort(node->getPorts().begin(), node->getPorts().end(), PortListSorter::CMP_COMBINED);
-        node->cachePortSides();
+            node->getInputPorts().clear();
+            node->getInputPorts().insert(node->getInputPorts().end(), inputPortOrders[i][j].begin(),
+                                         inputPortOrders[i][j].end());
+
+            node->getOutputPorts().clear();
+            node->getOutputPorts().insert(node->getOutputPorts().end(), outputPortOrders[i][j].begin(),
+                                          outputPortOrders[i][j].end());
+        }
     }
 }
 
@@ -57,34 +58,4 @@ std::vector<std::vector<std::shared_ptr<Node>>> SweepCopy::deepCopy(
     return result;
 }
 
-std::shared_ptr<Node> SweepCopy::assertCorrectPortSides(const std::shared_ptr<Node> &dummy) {
-    assert(dummy->getType() == NodeType::NORTH_SOUTH_PORT);
-
-    auto origin = dummy->getProperty(InternalProperties::IN_LAYER_LAYOUT_UNIT);
-    const auto &dummyPorts = dummy->getPorts();
-    auto dummyPort = dummyPorts[0];
-
-    for (const auto &port : origin->getPorts()) {
-        if (port == dummyPort->getProperty(InternalProperties::ORIGIN)) {
-            // 需要根据条件切换端口的边
-            if ((port->getSide() == PortSide::NORTH) && (dummy->id > origin->id)) {
-                port->setSide(PortSide::SOUTH);
-                if (port->isExplicitlySuppliedPortAnchor()) {
-                    double portHeight = port->getSize().y;
-                    double anchorY = port->getAnchor().y;
-                    port->getAnchor().y = portHeight - anchorY;
-                }
-            } else if ((port->getSide() == PortSide::SOUTH) && (origin->id > dummy->id)) {
-                port->setSide(PortSide::NORTH);
-                if (port->isExplicitlySuppliedPortAnchor()) {
-                    double portHeight = port->getSize().y;
-                    double anchorY = port->getAnchor().y;
-                    port->getAnchor().y = -(portHeight - anchorY);
-                }
-            }
-            break;
-        }
-    }
-    return origin;
-}
 }  // namespace GuiBridge

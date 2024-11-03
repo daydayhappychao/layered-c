@@ -23,8 +23,8 @@ public:
 
 class BarycenterHeuristic : public ICrossingMinimizationHeuristic {
 public:
-    BarycenterHeuristic(ForsterConstraintResolver *constraintResolver, std::mt19937 &random,
-                        AbstractBarycenterPortDistributor *portDistributor,
+    BarycenterHeuristic(std::shared_ptr<ForsterConstraintResolver>& constraintResolver, std::mt19937 &random,
+                        std::shared_ptr<AbstractBarycenterPortDistributor>& portDistributor,
                         const std::vector<std::vector<std::shared_ptr<Node>>> &graph);
 
     void minimizeCrossings(std::list<std::shared_ptr<Node>> &layer, bool preOrdered, bool randomize, bool forward);
@@ -32,7 +32,7 @@ public:
                            bool forwardSweep, bool isFirstSweep) override;
     bool setFirstLayerOrder(std::vector<std::vector<std::shared_ptr<Node>>> &order, bool isForwardSweep) override;
     void initAfterTraversal() override;
-    void initAtLayerLevel(int l, std::vector<std::vector<std::shared_ptr<Node>>> &nodeOrder);
+    void initAtLayerLevel(int l, std::vector<std::vector<std::shared_ptr<Node>>> &nodeOrder) override;
 
 private:
     void randomizeBarycenters(std::list<std::shared_ptr<Node>> &nodes);
@@ -48,8 +48,8 @@ private:
     std::vector<std::vector<std::shared_ptr<BarycenterState>>> barycenterState;  // 每个节点的重心状态
     std::vector<float> portRanks;                                                // 端口等级数组
     std::mt19937 &random;                                                        // 随机数生成器
-    ForsterConstraintResolver *constraintResolver;                               // 约束解析器
-    AbstractBarycenterPortDistributor *portDistributor;                          // 端口分配器
+    std::shared_ptr<ForsterConstraintResolver> constraintResolver;               // 约束解析器
+    std::shared_ptr<AbstractBarycenterPortDistributor> portDistributor;          // 端口分配器
 };
 
 }  // namespace GuiBridge

@@ -44,13 +44,12 @@ int AllCrossingsCounter::countCrossingsAt(int layerIndex,
     return totalCrossings;
 }
 
-void AllCrossingsCounter::initAtNodeLevel(int l, int n,
-                                          const std::vector<std::vector<std::shared_ptr<Node>>> &nodeOrder) {
+void AllCrossingsCounter::initAtNodeLevel(int l, int n, std::vector<std::vector<std::shared_ptr<Node>>> &nodeOrder) {
     const auto &node = nodeOrder[l][n];
 }
 
 void AllCrossingsCounter::initAtPortLevel(int l, int n, int p,
-                                          const std::vector<std::vector<std::shared_ptr<Node>>> &nodeOrder) {
+                                          std::vector<std::vector<std::shared_ptr<Node>>> &nodeOrder) {
     auto allPorts = nodeOrder[l][n]->getAllPorts();
     auto &port = allPorts[p];
     port->id = nPorts++;
@@ -59,8 +58,8 @@ void AllCrossingsCounter::initAtPortLevel(int l, int n, int p,
     }
 }
 
-void AllCrossingsCounter::initAtEdgeLevel(int l, int n, int p, int e, const std::shared_ptr<Edge> &edge,
-                                          const std::vector<std::vector<std::shared_ptr<Node>>> &nodeOrder) {
+void AllCrossingsCounter::initAtEdgeLevel(int l, int n, int p, int e, std::shared_ptr<Edge> &edge,
+                                          std::vector<std::vector<std::shared_ptr<Node>>> &nodeOrder) {
     auto allPorts = nodeOrder[l][n]->getAllPorts();
     auto &port = allPorts[p];
     if (edge->getSrc() == port && edge->getSrc()->getNode()->getLayer() == edge->getDst()->getNode()->getLayer()) {

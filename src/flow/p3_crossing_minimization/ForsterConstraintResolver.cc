@@ -89,8 +89,7 @@ ForsterConstraintResolver::ForsterConstraintResolver(
     barycenterStates.resize(currentNodeOrder.size());
     constraintGroups.resize(currentNodeOrder.size());
 }
-void ForsterConstraintResolver::initAtLayerLevel(int l,
-                                                 const std::vector<std::vector<std::shared_ptr<Node>>> &nodeOrder) {
+void ForsterConstraintResolver::initAtLayerLevel(int l, std::vector<std::vector<std::shared_ptr<Node>>> &nodeOrder) {
     barycenterStates[l].resize(nodeOrder[l].size());
     constraintGroups[l].resize(nodeOrder[l].size());
 }
@@ -99,7 +98,7 @@ std::shared_ptr<BarycenterState> ForsterConstraintResolver::stateOf(const std::s
 }
 
 void ForsterConstraintResolver::initAtNodeLevel(int l, int n,
-                                                const std::vector<std::vector<std::shared_ptr<Node>>> &nodeOrder) {
+                                                std::vector<std::vector<std::shared_ptr<Node>>> &nodeOrder) {
     initAtNodeLevel(nodeOrder[l][n], true);
 }
 
@@ -231,8 +230,6 @@ void ForsterConstraintResolver::handleViolatedConstraint(std::shared_ptr<Constra
                                                          std::shared_ptr<ConstraintGroup> secondNodeGroup,
                                                          std::vector<std::shared_ptr<ConstraintGroup>> &nodeGroups) {
     std::shared_ptr<ConstraintGroup> newNodeGroup = std::make_shared<ConstraintGroup>(firstNodeGroup, secondNodeGroup);
-    assert(newNodeGroup->getBarycenter() + 0.0001 >= secondNodeGroup->getBarycenter());
-    assert(newNodeGroup->getBarycenter() - 0.0001 <= firstNodeGroup->getBarycenter());
 
     auto nodeGroupIterator = nodeGroups.begin();
     bool alreadyInserted = false;

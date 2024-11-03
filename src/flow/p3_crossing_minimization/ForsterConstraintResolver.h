@@ -24,6 +24,7 @@ public:
     std::shared_ptr<Node> getNode() const;
 
     int incomingConstraintsCount;
+
 private:
     ForsterConstraintResolver &origin;
     double summedWeight;
@@ -37,8 +38,8 @@ class ForsterConstraintResolver : public Initializable {
 public:
     explicit ForsterConstraintResolver(const std::vector<std::vector<std::shared_ptr<Node>>> &currentNodeOrder);
 
-    void initAtLayerLevel(int l, const std::vector<std::vector<std::shared_ptr<Node>>> &nodeOrder) override;
-    void initAtNodeLevel(int l, int n, const std::vector<std::vector<std::shared_ptr<Node>>> &nodeOrder);
+    void initAtLayerLevel(int l, std::vector<std::vector<std::shared_ptr<Node>>> &nodeOrder) override;
+    void initAtNodeLevel(int l, int n, std::vector<std::vector<std::shared_ptr<Node>>> &nodeOrder) override;
     void initAtNodeLevel(const std::shared_ptr<Node> &node, bool fullInit);
 
     std::vector<std::vector<std::shared_ptr<BarycenterState>>> getBarycenterStates();
