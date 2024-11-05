@@ -25,6 +25,11 @@ public:
     const std::vector<std::vector<Neighbor>> &getLeftNeighbors() const { return leftNeighbors; }
     const std::vector<std::vector<Neighbor>> &getRightNeighbors() const { return rightNeighbors; }
 
+    std::vector<int> layerIndex;
+    std::vector<int> nodeIndex;
+    std::vector<std::vector<Neighbor>> leftNeighbors;
+    std::vector<std::vector<Neighbor>> rightNeighbors;
+
 private:
     NeighborhoodInformation() = default;
 
@@ -34,10 +39,6 @@ private:
                                            const std::shared_ptr<Graph> &graph);
 
     int nodeCount;
-    std::vector<int> layerIndex;
-    std::vector<int> nodeIndex;
-    std::vector<std::vector<Neighbor>> leftNeighbors;
-    std::vector<std::vector<Neighbor>> rightNeighbors;
 };
 
 }  // namespace GuiBridge

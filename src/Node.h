@@ -9,6 +9,7 @@
 #include <vector>
 
 #include "Shape.h"
+#include "math/Margin.h"
 #include "nlohmann/json_fwd.hpp"
 #include "opts/NodeSide.h"
 #include "opts/PortType.h"
@@ -63,6 +64,8 @@ public:
     void setDummy(const std::shared_ptr<Edge> &dummyOrigin);
     void setDummySource(const std::shared_ptr<Port> &dummySource) { this->dummySource = dummySource; };
     void setDummyTarget(const std::shared_ptr<Port> &dummyTarget) { this->dummyTarget = dummyTarget; };
+    
+    Margin margin;
 
 private:
     int id;
