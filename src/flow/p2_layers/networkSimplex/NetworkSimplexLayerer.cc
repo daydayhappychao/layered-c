@@ -28,7 +28,9 @@ void NetworkSimplexLayerer::process(std::shared_ptr<Graph> &graph) {
     const auto &layers = graph->getLayers();
     for (const auto &node : graph->getLayerlessNodes()) {
         while (layers.size() <= node->layerIndex) {
-            graph->addLayers(std::make_shared<Layer>(graph));
+            auto layerPtr = std::make_shared<Layer>(graph);
+            layerPtr->index = layers.size() + 1;
+            graph->addLayers(layerPtr);
         }
         node->setLayer(layers[node->layerIndex]);
     }

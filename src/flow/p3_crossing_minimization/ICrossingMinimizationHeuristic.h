@@ -8,12 +8,16 @@ namespace GuiBridge {
 class Node;
 class ICrossingMinimizationHeuristic : public Initializable {
 public:
-    virtual bool alwaysImproves() = 0;
+    virtual bool alwaysImproves() { return false; };
 
-    virtual bool setFirstLayerOrder(std::vector<std::vector<std::shared_ptr<Node>>> &order, bool forwardSweep) = 0;
+    virtual bool setFirstLayerOrder(std::vector<std::vector<std::shared_ptr<Node>>> &order, bool forwardSweep) {
+        return false;
+    };
     virtual bool minimizeCrossings(std::vector<std::vector<std::shared_ptr<Node>>> &order, int freeLayerIndex,
-                                   bool forwardSweep, bool isFirstSweep) = 0;
-    virtual bool isDeterministic();
+                                   bool forwardSweep, bool isFirstSweep) {
+        return false;
+    };
+    virtual bool isDeterministic() { return false; };
 };
 }  // namespace GuiBridge
 #endif

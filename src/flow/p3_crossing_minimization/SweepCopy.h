@@ -22,7 +22,7 @@ private:
 
 public:
     explicit SweepCopy(const std::vector<std::vector<std::shared_ptr<Node>>> &nodeOrderIn);
-    SweepCopy(const SweepCopy &sc);
+    explicit SweepCopy(const std::shared_ptr<SweepCopy> &sc);
 
     std::vector<std::vector<std::shared_ptr<Node>>> nodes() const;
     void transferNodeAndPortOrdersToGraph(std::shared_ptr<Graph> &lGraph, bool setPortConstraints);

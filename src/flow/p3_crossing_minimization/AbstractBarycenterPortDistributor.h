@@ -29,7 +29,7 @@ private:
     std::vector<std::shared_ptr<Port>> inLayerPorts;
 
     // 计算给定节点的输入或输出端口的排名
-    virtual float calculatePortRanks(std::shared_ptr<Node> &node, float rankSum, PortType type) = 0;
+    virtual float calculatePortRanks(std::shared_ptr<Node> &node, float rankSum, PortType type) { return 0.0; };
 
     // 分发端口
     void distributePorts(std::shared_ptr<Node> &node, PortType side);

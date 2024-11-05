@@ -3,12 +3,14 @@
 #include "../../Node.h"
 
 namespace GuiBridge {
-ConstraintGroup::ConstraintGroup(std::shared_ptr<Node> &node, ForsterConstraintResolver &origin) : origin(origin) {
+ConstraintGroup::ConstraintGroup(std::shared_ptr<Node> &node, std::shared_ptr<ForsterConstraintResolver> &origin)
+    : origin(origin) {
     nodes.push_back(node);
 }
 
 ConstraintGroup::ConstraintGroup(std::shared_ptr<ConstraintGroup> &nodeGroup1,
-                                 std::shared_ptr<ConstraintGroup> &nodeGroup2, ForsterConstraintResolver &origin)
+                                 std::shared_ptr<ConstraintGroup> &nodeGroup2,
+                                 std::shared_ptr<ForsterConstraintResolver> &origin)
     : origin(origin) {
     int length1 = nodeGroup1->nodes.size();
     int length2 = nodeGroup2->nodes.size();
@@ -57,11 +59,11 @@ ConstraintGroup::ConstraintGroup(std::shared_ptr<ConstraintGroup> &nodeGroup1,
 
 void ConstraintGroup::setBarycenter(double barycenter) {
     for (const auto &node : nodes) {
-        this->origin.stateOf(node)->barycenter = barycenter;
+        this->origin->stateOf(node)->barycenter = barycenter;
     }
 }
 
-double ConstraintGroup::getBarycenter() const { return this->origin.stateOf(nodes[0])->barycenter; }
+double ConstraintGroup::getBarycenter() const { return this->origin->stateOf(nodes[0])->barycenter; }
 
 std::list<std::shared_ptr<ConstraintGroup>> ConstraintGroup::getOutgoingConstraints() { return outgoingConstraints; }
 
@@ -85,7 +87,7 @@ std::shared_ptr<Node> ConstraintGroup::getNode() const {
 }
 
 ForsterConstraintResolver::ForsterConstraintResolver(
-    const std::vector<std::vector<std::shared_ptr<Node>>> &currentNodeOrder) {
+    std::vector<std::vector<std::shared_ptr<Node>>> &currentNodeOrder) {
     barycenterStates.resize(currentNodeOrder.size());
     constraintGroups.resize(currentNodeOrder.size());
 }
@@ -102,11 +104,13 @@ void ForsterConstraintResolver::initAtNodeLevel(int l, int n,
     initAtNodeLevel(nodeOrder[l][n], true);
 }
 
-void ForsterConstraintResolver::initAtNodeLevel(const std::shared_ptr<Node> &node, bool fullInit) {
+void ForsterConstraintResolver::initAtNodeLevel(std::shared_ptr<Node> &node, bool fullInit) {
     int layerIndex = node->getLayer()->id;
     int nodeIndex = node->getId();
 
-    constraintGroups[layerIndex][nodeIndex] = std::make_shared<ConstraintGroup>(node);
+    auto ptr = shared_from_this();
+
+    constraintGroups[layerIndex][nodeIndex] = std::make_shared<ConstraintGroup>(node, ptr);
 
     if (fullInit) {
         barycenterStates[layerIndex][nodeIndex] = std::make_shared<BarycenterState>(node);
@@ -120,7 +124,7 @@ std::vector<std::vector<std::shared_ptr<BarycenterState>>> ForsterConstraintReso
 void ForsterConstraintResolver::processConstraints(std::vector<std::shared_ptr<Node>> &nodes) {
     if (constraintsBetweenNonDummies) {
         processConstraints(nodes, true);
-        for (const auto &node : nodes) {
+        for (auto &node : nodes) {
             initAtNodeLevel(node, false);
         }
     }
@@ -229,7 +233,9 @@ ForsterConstraintResolver::findViolatedConstraint(std::vector<std::shared_ptr<Co
 void ForsterConstraintResolver::handleViolatedConstraint(std::shared_ptr<ConstraintGroup> firstNodeGroup,
                                                          std::shared_ptr<ConstraintGroup> secondNodeGroup,
                                                          std::vector<std::shared_ptr<ConstraintGroup>> &nodeGroups) {
-    std::shared_ptr<ConstraintGroup> newNodeGroup = std::make_shared<ConstraintGroup>(firstNodeGroup, secondNodeGroup);
+    auto ptr = shared_from_this();
+    std::shared_ptr<ConstraintGroup> newNodeGroup =
+        std::make_shared<ConstraintGroup>(firstNodeGroup, secondNodeGroup, ptr);
 
     auto nodeGroupIterator = nodeGroups.begin();
     bool alreadyInserted = false;

@@ -29,7 +29,7 @@ public:
                          std::vector<std::vector<std::shared_ptr<Node>>> &nodeOrder) override;
 
     // 遍历后初始化
-    void initAfterTraversal();
+    void initAfterTraversal() override;
 
 private:
     int countCrossingsAt(int layerIndex, const std::vector<std::vector<std::shared_ptr<Node>>> &currentOrder);

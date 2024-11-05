@@ -34,7 +34,7 @@ public:
         const std::vector<std::shared_ptr<Node>> &nodes, PortType type);
     void switchPorts(std::shared_ptr<Port> &topPort, std::shared_ptr<Port> &bottomPort);
     void switchNodes(std::shared_ptr<Node> &wasUpperNode, std::shared_ptr<Node> &wasLowerNode, PortType type);
-    int positionOf(std::shared_ptr<Port> &port) const;
+    int positionOf(const std::shared_ptr<Port> &port) const;
 
 private:
     std::vector<int> &portPositions;
@@ -74,9 +74,9 @@ private:
 struct ComparePosition {
     const CrossingCounter *that;
 
-    explicit ComparePosition(const CrossingCounter *that) : that(that) {}
+    explicit ComparePosition(CrossingCounter *that) : that(that) {}
 
-    bool operator()(std::shared_ptr<Port> &a, std::shared_ptr<Port> &b) const {
+    bool operator()(const std::shared_ptr<Port> &a, const std::shared_ptr<Port> &b) {
         return that->positionOf(a) < that->positionOf(b);  // 根据 positionOf 进行比较
     }
 };

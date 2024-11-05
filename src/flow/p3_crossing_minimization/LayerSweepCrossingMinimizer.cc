@@ -10,7 +10,7 @@
 namespace GuiBridge {
 void LayerSweepCrossingMinimizer::process(const std::shared_ptr<Graph> &graph) {
     initialize(graph);
-    if (graphInfoHolder->crossMinDeterministic()) {
+    if (!graphInfoHolder->crossMinDeterministic()) {
         compareDifferentRandomizedLayouts(graphInfoHolder);
     } else if (graphInfoHolder->crossMinAlwaysImproves()) {
         minimizeCrossingsNoCounter(graphInfoHolder);
@@ -23,6 +23,7 @@ void LayerSweepCrossingMinimizer::process(const std::shared_ptr<Graph> &graph) {
 
 void LayerSweepCrossingMinimizer::initialize(const std::shared_ptr<Graph> &rootGraph) {
     auto gData = std::make_shared<GraphInfoHolder>(rootGraph, crossMinType);
+    gData->init();
     graphInfoHolder = gData;
 }
 

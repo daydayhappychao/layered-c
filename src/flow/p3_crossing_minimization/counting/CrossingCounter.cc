@@ -32,7 +32,11 @@ std::pair<int, int> CrossingCounter::countCrossingsBetweenPortsInBothOrders(std:
     auto upperLowerCrossings = countCrossingsOnPorts(ports);
     indexTree->clear();
     switchPorts(upperPort, lowerPort);
-    std::sort(ports.begin(), ports.end(), [this](auto &a, auto &b) { return positionOf(a) < positionOf(b); });
+
+    std::vector<std::shared_ptr<Port>> portsArr(ports.begin(), ports.end());
+    std::sort(portsArr.begin(), portsArr.end(), [this](auto &a, auto &b) { return positionOf(a) < positionOf(b); });
+    ports = std::list(portsArr.begin(), portsArr.end());
+
     int lowerUpperCrossings = countCrossingsOnPorts(ports);
     indexTree->clear();
     switchPorts(lowerPort, upperPort);
@@ -47,7 +51,9 @@ std::pair<int, int> CrossingCounter::countInLayerCrossingsBetweenNodesInBothOrde
     switchNodes(upperNode, lowerNode, type);
 
     indexTree->clear();
-    std::sort(ports.begin(), ports.end(), [this](auto &a, auto &b) { return positionOf(a) < positionOf(b); });
+    std::vector<std::shared_ptr<Port>> portsArr(ports.begin(), ports.end());
+    std::sort(portsArr.begin(), portsArr.end(), [this](auto &a, auto &b) { return positionOf(a) < positionOf(b); });
+    ports = std::list<std::shared_ptr<Port>>(portsArr.begin(), portsArr.end());
     int lowerUpperCrossings = countInLayerCrossingsOnPorts(ports);
     switchNodes(lowerNode, upperNode, type);
     indexTree->clear();
@@ -69,6 +75,10 @@ std::list<std::shared_ptr<Port>> CrossingCounter::initPortPositionsForInLayerCro
 }
 
 void CrossingCounter::switchPorts(std::shared_ptr<Port> &topPort, std::shared_ptr<Port> &bottomPort) {
+    int maxLen = std::max(topPort->id, bottomPort->id);
+    if (portPositions.size() < maxLen + 1) {
+        portPositions.resize(maxLen + 1);
+    }
     int topPortPos = portPositions[topPort->id];
     portPositions[topPort->id] = portPositions[bottomPort->id];
     portPositions[bottomPort->id] = topPortPos;
@@ -78,10 +88,16 @@ void CrossingCounter::switchNodes(std::shared_ptr<Node> &wasUpperNode, std::shar
                                   PortType type) {
     auto ports = inNorthSouthEastWestOrder(wasUpperNode, type);
     for (auto &port : ports) {
+        if (portPositions.size() < port->id + 1) {
+            portPositions.resize(port->id + 1);
+        }
         portPositions[port->id] = positionOf(port) + nodeCardinalities[wasLowerNode->getId()];
     }
     ports = inNorthSouthEastWestOrder(wasLowerNode, type);
     for (auto &port : ports) {
+        if (portPositions.size() < port->id + 1) {
+            portPositions.resize(port->id + 1);
+        }
         portPositions[port->id] = positionOf(port) - nodeCardinalities[wasUpperNode->getId()];
     }
 }
@@ -161,6 +177,10 @@ void CrossingCounter::initPositions(const std::vector<std::shared_ptr<Node>> &no
             nodeCardinalities[node->getId()] = nodePorts.size();
         }
         for (const auto &port : nodePorts) {
+            std::cout << "Processing port ID: " << port->id << ", portPositions: " << portPositions.size() << std::endl;
+            if (portPositions.size() < (port->id + 1)) {
+                portPositions.resize(port->id + 1);
+            }
             portPositions[port->id] = numPorts++;
         }
         ports.insert(ports.end(), nodePorts.begin(), nodePorts.end());
@@ -174,6 +194,9 @@ int CrossingCounter::emptyStack(std::deque<std::shared_ptr<Node>> &stack, std::l
         auto &dummy = stack.back();
         stack.pop_back();
         auto &p = dummy->getPortsByPortType(type)[0];
+        if (portPositions.size() < p->id + 1) {
+            portPositions.resize(p->id + 1);
+        }
         portPositions[p->id] = index++;
         ports.push_back(p);
     }
@@ -213,12 +236,36 @@ bool CrossingCounter::isInLayer(std::shared_ptr<Edge> &edge) {
     return sourceLayer == targetLayer;
 }
 
-int CrossingCounter::positionOf(std::shared_ptr<Port> &port) const { return portPositions[port->id]; }
+int CrossingCounter::positionOf(const std::shared_ptr<Port> &port) const { return portPositions[port->id]; }
 
 std::shared_ptr<Port> CrossingCounter::otherEndOf(std::shared_ptr<Edge> &edge, std::shared_ptr<Port> &fromPort) {
     return fromPort == edge->getSrc() ? edge->getDst() : edge->getSrc();
 }
 
-
+int CrossingCounter::countInLayerCrossingsOnPorts(std::list<std::shared_ptr<Port>> &ports) {
+    int crossings = 0;
+    for (auto &port : ports) {
+        indexTree->removeAll(positionOf(port));
+        int numBetweenLayerEdges = 0;
+        for (auto &edge : port->getEdges()) {
+            if (isInLayer(edge)) {
+                int endPosition = positionOf(otherEndOf(edge, port));
+                if (endPosition > positionOf(port)) {
+                    crossings += indexTree->rank(endPosition);
+                    ends.push_back(endPosition);
+                }
+            } else {
+                numBetweenLayerEdges++;
+            }
+        }
+        crossings += indexTree->size() * numBetweenLayerEdges;
+        while (!ends.empty()) {
+            auto end = ends.back();
+            indexTree->add(end);
+            ends.pop_back();
+        }
+    }
+    return crossings;
+}
 
 }  // namespace GuiBridge

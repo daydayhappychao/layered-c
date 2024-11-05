@@ -31,6 +31,9 @@ public:
     void revertOppositePort();
 
     void reverse(const std::shared_ptr<Graph> &layeredGraph, bool adaptPorts);
+    bool reversed = false;
+
+    bool isInLayerEdge();
 
     nlohmann::json json();
 
@@ -45,10 +48,13 @@ private:
     std::weak_ptr<Port> dst;
     std::string name;
     KVectorChain bendPoints;
-    bool reversed = false;
     OppositeType oppositeType = OppositeType::None;
     // 一端 port 被隐藏了，就存放在这里
     std::weak_ptr<Port> oppositePort;
+
+    // 存放原始数据
+    std::weak_ptr<Port> originSrc;
+    std::weak_ptr<Port> originDst;
 };
 }  // namespace GuiBridge
 #endif  // EDGE_HPP

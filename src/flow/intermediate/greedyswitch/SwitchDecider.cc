@@ -8,7 +8,7 @@
 namespace GuiBridge {
 SwitchDecider::SwitchDecider(int freeLayerIndex, const std::vector<std::vector<std::shared_ptr<Node>>> &graph,
                              std::shared_ptr<CrossingMatrixFiller> &crossingMatrixFiller,
-                             const std::vector<int> &portPositions, std::shared_ptr<GraphInfoHolder> &graphData,
+                             std::vector<int> &portPositions, std::shared_ptr<GraphInfoHolder> &graphData,
                              bool oneSided)
     : crossingMatrixFiller(crossingMatrixFiller), graphData(graphData) {
     if (freeLayerIndex >= graph.size()) {

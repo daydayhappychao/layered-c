@@ -27,9 +27,10 @@ void BarycenterHeuristic::minimizeCrossings(std::list<std::shared_ptr<Node>> &la
     }
 
     if (layer.size() > 1) {
-        std::sort(layer.begin(), layer.end(), [this](auto &n1, auto &n2) {
-            BarycenterState *s1 = stateOf(n1);
-            BarycenterState *s2 = stateOf(n2);
+        std::vector<std::shared_ptr<Node>> layerArr(layer.begin(), layer.end());
+        std::sort(layerArr.begin(), layerArr.end(), [this](auto &n1, auto &n2) {
+            auto s1 = stateOf(n1);
+            auto s2 = stateOf(n2);
 
             if (s1->barycenter != -1 && s2->barycenter != -1) {
                 return s1->barycenter < s2->barycenter;  // 使用小于运算符进行比较
@@ -42,7 +43,6 @@ void BarycenterHeuristic::minimizeCrossings(std::list<std::shared_ptr<Node>> &la
             }
             return false;  // 都不存在重心，保持顺序
         });
-        std::vector<std::shared_ptr<Node>> layerArr(layer.begin(), layer.end());
         this->constraintResolver->processConstraints(layerArr);
     }
 }

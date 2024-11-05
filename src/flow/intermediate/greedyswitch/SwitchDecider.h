@@ -17,7 +17,7 @@ enum class CrossingCountSide { WEST, EAST };
 class SwitchDecider {
 public:
     SwitchDecider(int freeLayerIndex, const std::vector<std::vector<std::shared_ptr<Node>>> &graph,
-                  std::shared_ptr<CrossingMatrixFiller> &crossingMatrixFiller, const std::vector<int> &portPositions,
+                  std::shared_ptr<CrossingMatrixFiller> &crossingMatrixFiller, std::vector<int> &portPositions,
                   std::shared_ptr<GraphInfoHolder> &graphData, bool oneSided);
 
     void notifyOfSwitch(std::shared_ptr<Node> &upperNode, std::shared_ptr<Node> &lowerNode);

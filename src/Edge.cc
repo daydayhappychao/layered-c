@@ -5,6 +5,7 @@
 
 #include "./opts/PortType.h"
 #include "./utils/GraphUtil.h"
+#include "Node.h"
 #include "Port.h"
 #include "math/KVectorChain.h"
 #include "nlohmann/json.hpp"
@@ -13,7 +14,9 @@ namespace GuiBridge {
 
 Edge::Edge(const std::shared_ptr<Port> &src, const std::shared_ptr<Port> &dst) {
     this->src = src;
+    this->originSrc = src;
     this->dst = dst;
+    this->originDst = dst;
 }
 
 std::shared_ptr<Port> Edge::getSrc() { return src.lock(); }
@@ -85,27 +88,34 @@ void Edge::revertOppositePort() {
 }
 
 void Edge::reverse(const std::shared_ptr<Graph> &layeredGraph, bool adaptPorts) {
-    std::shared_ptr<Port> oldSource = getSrc();
-    std::shared_ptr<Port> oldDst = getDst();
-    setSrc(nullptr);
-    setDst(nullptr);
+    if (!this->reversed) {
+        std::shared_ptr<Port> oldSource = getSrc();
+        std::shared_ptr<Port> oldDst = getDst();
+        setSrc(nullptr);
+        setDst(nullptr);
 
-    if (adaptPorts && oldDst->getInternalCollect()) {
-        setSrc(provideCollectorPort(layeredGraph, oldDst->getNode(), PortType::OUTPUT));
-    } else {
-        setSrc(oldDst);
-    }
+        if (adaptPorts && oldDst->getInternalCollect()) {
+            setSrc(provideCollectorPort(layeredGraph, oldDst->getNode(), PortType::OUTPUT));
+        } else {
+            setSrc(oldDst);
+        }
 
-    if (adaptPorts && oldSource->getInternalCollect()) {
-        setDst(provideCollectorPort(layeredGraph, oldSource->getNode(), PortType::INPUT));
+        if (adaptPorts && oldSource->getInternalCollect()) {
+            setDst(provideCollectorPort(layeredGraph, oldSource->getNode(), PortType::INPUT));
+        } else {
+            setDst(oldSource);
+        }
     } else {
-        setDst(oldSource);
+        setSrc(originSrc.lock());
+        setDst(originDst.lock());
     }
 
     this->reversed = !this->reversed;
 }
 
 KVectorChain Edge::getBendPoints() { return bendPoints; }
+
+bool Edge::isInLayerEdge() { return src.lock()->getNode()->getLayer() == dst.lock()->getNode()->getLayer(); }
 
 nlohmann::json Edge::json() {
     nlohmann::json res;

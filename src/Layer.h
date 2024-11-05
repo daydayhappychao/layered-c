@@ -30,6 +30,7 @@ public:
     std::string toString() const;
 
     int id;
+    int index;
 };
 }  // namespace GuiBridge
 #endif  // LAYER_H

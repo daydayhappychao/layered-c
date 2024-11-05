@@ -4,6 +4,7 @@
 #include <vector>
 #include "../../Graph.h"
 #include "../intermediate/greedyswitch/GreedySwitchHeuristic.h"
+#include "AbstractBarycenterPortDistributor.h"
 #include "BarycenterHeuristic.h"
 #include "ForsterConstraintResolver.h"
 #include "ISweepPortDistributor.h"
@@ -11,8 +12,10 @@
 #include "counting/Initializable.h"
 
 namespace GuiBridge {
-GraphInfoHolder::GraphInfoHolder(const std::shared_ptr<Graph> &graph, CrossMinType crossMinType) {
-    this->graph = graph;
+GraphInfoHolder::GraphInfoHolder(const std::shared_ptr<Graph> &graph, CrossMinType crossMinType)
+    : graph(graph), crossMinType(crossMinType) {}
+
+void GraphInfoHolder::init() {
     this->currentNodeOrder = graph->toNodeArray();
 
     crossingsCounter = std::make_shared<AllCrossingsCounter>(currentNodeOrder);
@@ -22,17 +25,22 @@ GraphInfoHolder::GraphInfoHolder(const std::shared_ptr<Graph> &graph, CrossMinTy
 
     portDistributor = sweepPortDistributorCreate(crossMinType, random, currentNodeOrder);
 
-    std::vector<std::shared_ptr<Initializable>> initializables{shared_from_this(), crossingsCounter, portDistributor};
+    auto thisPtr = shared_from_this();
+
+    std::vector<std::shared_ptr<Initializable>> initializables{thisPtr, crossingsCounter, portDistributor};
 
     if (crossMinType == CrossMinType::BARYCENTER) {
-        std::shared_ptr<Initializable> constraintResolver =
+        std::shared_ptr<ForsterConstraintResolver> constraintResolver =
             std::make_shared<ForsterConstraintResolver>(currentNodeOrder);
         initializables.push_back(constraintResolver);
+
+        auto portDistributorPtr = std::static_pointer_cast<AbstractBarycenterPortDistributor>(portDistributor);
         crossMinimizer =
-            std::make_shared<BarycenterHeuristic>(constraintResolver, random, portDistributor, currentNodeOrder);
+            std::make_shared<BarycenterHeuristic>(constraintResolver, random, portDistributorPtr, currentNodeOrder);
 
     } else {
-        crossMinimizer = std::make_shared<GreedySwitchHeuristic>(crossMinType, shared_from_this());
+        auto ptr = shared_from_this();
+        crossMinimizer = std::make_shared<GreedySwitchHeuristic>(crossMinType, ptr);
     }
 
     initializables.push_back(crossMinimizer);

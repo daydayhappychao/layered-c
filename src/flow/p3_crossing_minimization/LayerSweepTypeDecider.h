@@ -15,7 +15,7 @@ class Edge;
 /**
  * 决定是否使用自下而上的扫掠方法。
  */
-class LayerSweepTypeDecider : public Initializable {
+class LayerSweepTypeDecider {
 private:
     struct NodeInfo {
         int connectedEdges = 0;         // 连接边的数量
@@ -32,8 +32,8 @@ private:
 public:
     explicit LayerSweepTypeDecider(GraphInfoHolder &graphData);
     bool useBottomUp();
-    void initAtLayerLevel(int l, const std::vector<std::vector<std::shared_ptr<Node>>> &nodeOrder) override;
-    void initAtNodeLevel(int l, int n, std::vector<std::vector<std::shared_ptr<Node>>> &nodeOrder) override;
+    void initAtLayerLevel(int l, std::vector<std::vector<std::shared_ptr<Node>>> &nodeOrder);
+    void initAtNodeLevel(int l, int n, std::vector<std::vector<std::shared_ptr<Node>>> &nodeOrder);
 
 private:
     void transferInfoToTarget(NodeInfo &currentNode, std::shared_ptr<Edge> &edge);

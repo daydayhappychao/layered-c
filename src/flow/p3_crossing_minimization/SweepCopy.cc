@@ -15,8 +15,10 @@ SweepCopy::SweepCopy(const std::vector<std::vector<std::shared_ptr<Node>>> &node
     }
 }
 
-SweepCopy::SweepCopy(const SweepCopy &sc)
-    : nodeOrder(deepCopy(sc.nodeOrder)), inputPortOrders(sc.inputPortOrders), outputPortOrders(sc.outputPortOrders) {}
+SweepCopy::SweepCopy(const std::shared_ptr<SweepCopy> &sc)
+    : nodeOrder(deepCopy(sc->nodeOrder)),
+      inputPortOrders(sc->inputPortOrders),
+      outputPortOrders(sc->outputPortOrders) {}
 
 std::vector<std::vector<std::shared_ptr<Node>>> SweepCopy::nodes() const { return nodeOrder; }
 

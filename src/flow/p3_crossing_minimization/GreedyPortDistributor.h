@@ -17,7 +17,7 @@ enum class PortType;
 class GreedyPortDistributor : public ISweepPortDistributor {
 public:
     bool distributePortsWhileSweeping(std::vector<std::vector<std::shared_ptr<Node>>> &nodeOrder, int currentIndex,
-                                      bool isForwardSweep);
+                                      bool isForwardSweep) override;
 
     void initAtNodeLevel(int l, int n, std::vector<std::vector<std::shared_ptr<Node>>> &nodeOrder) override;
     void initAfterTraversal() override;

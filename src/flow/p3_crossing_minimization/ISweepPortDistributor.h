@@ -12,8 +12,10 @@ namespace GuiBridge {
 
 class ISweepPortDistributor : public Initializable {
 public:
-    virtual bool distributePortsWhileSweeping(const std::vector<std::vector<std::shared_ptr<Node>>> &order,
-                                              int freeLayerIndex, bool isForwardSweep) = 0;
+    virtual bool distributePortsWhileSweeping(std::vector<std::vector<std::shared_ptr<Node>>> &order,
+                                              int freeLayerIndex, bool isForwardSweep) {
+        return false;
+    };
 };
 
 std::shared_ptr<ISweepPortDistributor> sweepPortDistributorCreate(

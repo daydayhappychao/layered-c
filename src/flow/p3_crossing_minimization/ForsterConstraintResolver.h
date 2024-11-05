@@ -9,9 +9,9 @@ namespace GuiBridge {
 class ForsterConstraintResolver;
 class ConstraintGroup {
 public:
-    explicit ConstraintGroup(std::shared_ptr<Node> &node, ForsterConstraintResolver &origin);
+    explicit ConstraintGroup(std::shared_ptr<Node> &node, std::shared_ptr<ForsterConstraintResolver> &origin);
     ConstraintGroup(std::shared_ptr<ConstraintGroup> &nodeGroup1, std::shared_ptr<ConstraintGroup> &nodeGroup2,
-                    ForsterConstraintResolver &origin);
+                    std::shared_ptr<ForsterConstraintResolver> &origin);
     void setBarycenter(double barycenter);
     double getBarycenter() const;
     std::list<std::shared_ptr<ConstraintGroup>> getOutgoingConstraints();
@@ -26,7 +26,7 @@ public:
     int incomingConstraintsCount;
 
 private:
-    ForsterConstraintResolver &origin;
+    std::shared_ptr<ForsterConstraintResolver> &origin;
     double summedWeight;
     int degree;
     std::vector<std::shared_ptr<Node>> nodes;
@@ -34,13 +34,17 @@ private:
     std::list<std::shared_ptr<ConstraintGroup>> incomingConstraints;
 };
 
-class ForsterConstraintResolver : public Initializable {
+class ForsterConstraintResolver : public Initializable, public std::enable_shared_from_this<ForsterConstraintResolver> {
 public:
-    explicit ForsterConstraintResolver(const std::vector<std::vector<std::shared_ptr<Node>>> &currentNodeOrder);
+    explicit ForsterConstraintResolver(std::vector<std::vector<std::shared_ptr<Node>>> &currentNodeOrder);
 
     void initAtLayerLevel(int l, std::vector<std::vector<std::shared_ptr<Node>>> &nodeOrder) override;
     void initAtNodeLevel(int l, int n, std::vector<std::vector<std::shared_ptr<Node>>> &nodeOrder) override;
-    void initAtNodeLevel(const std::shared_ptr<Node> &node, bool fullInit);
+    void initAtNodeLevel(std::shared_ptr<Node> &node, bool fullInit);
+    void initAtPortLevel(int l, int n, int p, std::vector<std::vector<std::shared_ptr<Node>>> &nodeOrder) override{};
+    void initAtEdgeLevel(int l, int n, int p, int e, std::shared_ptr<Edge> &edge,
+                         std::vector<std::vector<std::shared_ptr<Node>>> &nodeOrder) override{};
+    void initAfterTraversal() override{};
 
     std::vector<std::vector<std::shared_ptr<BarycenterState>>> getBarycenterStates();
     void processConstraints(std::vector<std::shared_ptr<Node>> &nodes);

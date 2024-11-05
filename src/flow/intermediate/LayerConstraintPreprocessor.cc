@@ -9,7 +9,7 @@ void LayerConstraintPreprocessor::process(std::shared_ptr<Graph> &graph) {
     auto &nodeList = graph->getLayerlessNodes();
     for (auto it = nodeList.begin(); it != nodeList.end();) {
         auto lNode = *it;
-
+        // 固定在首列和末列的先隐藏
         if (isRelevantNode(lNode)) {
             hide(lNode);
             hiddenNodes.push_back(lNode);

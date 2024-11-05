@@ -16,6 +16,7 @@ class Node;
 class GraphInfoHolder : public Initializable, public std::enable_shared_from_this<GraphInfoHolder> {
 public:
     explicit GraphInfoHolder(const std::shared_ptr<Graph> &graph, CrossMinType crossMinType);
+    void init();
     std::shared_ptr<Graph> graph;
 
     // node orders
@@ -56,6 +57,7 @@ public:
     void initAfterTraversal() override { portPositions.resize(nPorts); }
 
 private:
+    CrossMinType crossMinType;
 };
 }  // namespace GuiBridge
 #endif

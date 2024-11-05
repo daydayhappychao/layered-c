@@ -5,13 +5,15 @@
 #include <string>
 #include <vector>
 
+#include "Shape.h"
+#include "math/KVector.h"
 #include "nlohmann/json_fwd.hpp"
 #include "opts/PortType.h"
 
 namespace GuiBridge {
 class Node;  // 前向声明
 class Edge;
-class Port : public std::enable_shared_from_this<Port> {
+class Port : public std::enable_shared_from_this<Port>, public Shape {
 public:
     explicit Port(std::string name);
 
@@ -31,6 +33,8 @@ public:
 
     PortType getType();
 
+    KVector getAnchor();
+
     nlohmann::json json();
     int id;
 
@@ -38,6 +42,7 @@ private:
     std::string name;
     std::weak_ptr<Node> node;
     std::vector<std::weak_ptr<Edge>> edges;
+    KVector anchor;
 
     bool internal_collect = false;
     int x = 0;

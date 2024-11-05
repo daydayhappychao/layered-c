@@ -69,6 +69,8 @@ PortType Port::getType() {
     return PortType::OUTPUT;
 }
 
+KVector Port::getAnchor() { return anchor; }
+
 nlohmann::json Port::json() {
     nlohmann::json res;
     res["x"] = x;
