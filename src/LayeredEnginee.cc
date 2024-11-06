@@ -1,5 +1,6 @@
 #include "LayeredEnginee.h"
 
+#include <cstdio>
 #include <iostream>
 #include <memory>
 #include <nlohmann/json.hpp>
@@ -7,6 +8,7 @@
 #include <utility>
 
 #include "./flow/p1_cycle_breaking/GreedyCycleBreaker.h"
+#include "./flow/p4_nodes/BKNodePlacer.h"
 #include "./utils/ComponentsProcessor.h"
 #include "Graph.h"
 #include "flow/intermediate/LayerConstraintPostprocessor.h"
@@ -42,11 +44,14 @@ void ELKLayered::layered() {
     // p3 crossing minimization
     LongEdgeSplitter longEdgeSplitter;
     longEdgeSplitter.process(graph);
-    LayerSweepCrossingMinimizer layerSweepCrossingMinimizer(CrossMinType::BARYCENTER);
-    layerSweepCrossingMinimizer.process(graph);
-    LayerSweepCrossingMinimizer layerSweepCrossingMinimizer2(CrossMinType::TWO_SIDED_GREEDY_SWITCH);
-    layerSweepCrossingMinimizer2.process(graph);
+    // LayerSweepCrossingMinimizer layerSweepCrossingMinimizer(CrossMinType::BARYCENTER);
+    // layerSweepCrossingMinimizer.process(graph);
+    // LayerSweepCrossingMinimizer layerSweepCrossingMinimizer2(CrossMinType::TWO_SIDED_GREEDY_SWITCH);
+    // layerSweepCrossingMinimizer2.process(graph);
     // p4 node placement
+    BKNodePlacer bkNodePlacer;
+    bkNodePlacer.process(graph);
+    printf("哈哈");
 
     // p5 edge routing
 }

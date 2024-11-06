@@ -47,6 +47,8 @@ public:
     bool isdelim(char c, const std::string &delim);
     double x;
     double y;
+    void setX(double value) { x = value; };
+    void setY(double value) { y = value; };
 
 private:
     double DEFAULT_FUZZYNESS = 0.05;

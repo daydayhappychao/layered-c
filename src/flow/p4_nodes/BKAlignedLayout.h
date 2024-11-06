@@ -39,9 +39,9 @@ public:
     HDirection hdir;
     std::vector<bool> su;
     std::vector<bool> od;
+    std::shared_ptr<Graph> layeredGraph;
 
 private:
-    std::shared_ptr<Graph> layeredGraph;
     std::shared_ptr<Node> getLowerNeighbor(std::shared_ptr<Node> &n, std::shared_ptr<NeighborhoodInformation> &ni);
     std::shared_ptr<Node> getUpperNeighbor(std::shared_ptr<Node> &n, std::shared_ptr<NeighborhoodInformation> &ni);
 };

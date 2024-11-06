@@ -9,8 +9,8 @@
 namespace GuiBridge {
 class Shape {
 public:
-    KVector getPos() const;
-    KVector getSize() const;
+    KVector getPos();
+    KVector getSize();
 
 private:
     KVector pos = KVector();

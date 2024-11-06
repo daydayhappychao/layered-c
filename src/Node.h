@@ -64,12 +64,12 @@ public:
     void setDummy(const std::shared_ptr<Edge> &dummyOrigin);
     void setDummySource(const std::shared_ptr<Port> &dummySource) { this->dummySource = dummySource; };
     void setDummyTarget(const std::shared_ptr<Port> &dummyTarget) { this->dummyTarget = dummyTarget; };
-    
+
     Margin margin;
+    std::string name;
 
 private:
     int id;
-    std::string name;
     std::vector<std::shared_ptr<Port>> inputPorts;
     std::vector<std::shared_ptr<Port>> outputPorts;
     std::shared_ptr<Graph> graph;

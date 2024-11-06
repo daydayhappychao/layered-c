@@ -31,8 +31,6 @@ public:
     std::vector<std::vector<Neighbor>> rightNeighbors;
 
 private:
-    NeighborhoodInformation() = default;
-
     static void determineAllLeftNeighbors(const std::shared_ptr<NeighborhoodInformation> &ni,
                                           const std::shared_ptr<Graph> &graph);
     static void determineAllRightNeighbors(const std::shared_ptr<NeighborhoodInformation> &ni,

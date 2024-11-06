@@ -16,8 +16,8 @@ class Edge;
 class BKAligner {
 public:
     BKAligner(std::shared_ptr<Graph> &layeredGraph, std::shared_ptr<NeighborhoodInformation> &ni);
-    void verticalAlignment(BKAlignedLayout &bal, std::set<std::shared_ptr<Edge>> &markedEdges);
-    void insideBlockShift(BKAlignedLayout &bal);
+    void verticalAlignment(std::shared_ptr<BKAlignedLayout> &bal, std::set<std::shared_ptr<Edge>> &markedEdges);
+    void insideBlockShift(std::shared_ptr<BKAlignedLayout> &bal);
 
 private:
     std::shared_ptr<Graph> layeredGraph;
