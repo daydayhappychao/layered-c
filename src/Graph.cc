@@ -5,6 +5,7 @@
 
 #include "Layer.h"
 #include "Node.h"
+#include "nlohmann/json.hpp"
 
 namespace GuiBridge {
 
@@ -47,5 +48,13 @@ std::vector<std::vector<std::shared_ptr<Node>>> Graph::toNodeArray() {
     }
     return nodeArray;
 }
+
+nlohmann::json Graph::json() {
+    nlohmann::json res;
+    for (auto &n : nodes) {
+        res['node'].push_back(n->json());
+    }
+    return res;
+};
 
 }  // namespace GuiBridge

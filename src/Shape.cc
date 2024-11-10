@@ -6,6 +6,6 @@
 #include "math/KVector.h"
 
 namespace GuiBridge {
-KVector Shape::getPos() { return this->pos; }
-KVector Shape::getSize() { return this->size; }
+KVector& Shape::getPos() { return this->pos; }
+KVector& Shape::getSize() { return this->size; }
 }  // namespace GuiBridge

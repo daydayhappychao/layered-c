@@ -11,6 +11,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED True)
 
 # 包含 Homebrew 安装路径
 include_directories(/opt/homebrew/include)  
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include)  
 link_directories(/opt/homebrew/lib)       
 
 # 查找所有源文件

@@ -13,6 +13,7 @@
 #include "Graph.h"
 #include "flow/intermediate/LayerConstraintPostprocessor.h"
 #include "flow/intermediate/LayerConstraintPreprocessor.h"
+#include "flow/intermediate/LayerSizeAndGraphHeightCalculator.h"
 #include "flow/p2_layers/networkSimplex/NetworkSimplexLayerer.h"
 #include "flow/p3_crossing_minimization/LayerSweepCrossingMinimizer.h"
 #include "flow/p3_crossing_minimization/LongEdgeSplitter.h"
@@ -51,9 +52,13 @@ void ELKLayered::layered() {
     // p4 node placement
     BKNodePlacer bkNodePlacer;
     bkNodePlacer.process(graph);
-    printf("哈哈");
+
+    LayerSizeAndGraphHeightCalculator layerSizeAndGraphHeightCalculator;
+    layerSizeAndGraphHeightCalculator.process(graph);
 
     // p5 edge routing
+
+    printJson();
 }
 
 void ELKLayered::printLayers() {

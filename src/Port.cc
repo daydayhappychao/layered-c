@@ -14,7 +14,10 @@
 
 namespace GuiBridge {
 
-Port::Port(std::string name) : name(std::move(name)) {}
+Port::Port(std::string name) : name(std::move(name)) {
+    this->getSize().setX(5);
+    this->getSize().setY(5);
+}
 
 std::shared_ptr<Node> Port::getNode() { return node.lock(); }
 void Port::setNode(const std::shared_ptr<Node> &node) { this->node = node; }

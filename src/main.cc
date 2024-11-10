@@ -86,11 +86,11 @@ int main() {
     auto edge3 = std::make_shared<Edge>(fix_port_2_1, port2_1);
     auto edge4 = std::make_shared<Edge>(port1_3, port3_1);
     auto edge5 = std::make_shared<Edge>(port2_2, port4_1);
-    auto edge6 = std::make_shared<Edge>(port2_3, port5_3);
+    // auto edge6 = std::make_shared<Edge>(port2_3, port5_3);
     auto edge7 = std::make_shared<Edge>(port3_2, port5_1);
     auto edge8 = std::make_shared<Edge>(port4_3, port5_2);
     auto edge9 = std::make_shared<Edge>(port5_4, fix_port_3_1);
-    auto edge10 = std::make_shared<Edge>(port5_5, port4_2);
+    // auto edge10 = std::make_shared<Edge>(port5_5, port4_2);
 
     // 添加边到图
     graph->addEdge(edge1);
@@ -98,11 +98,11 @@ int main() {
     graph->addEdge(edge3);
     graph->addEdge(edge4);
     graph->addEdge(edge5);
-    graph->addEdge(edge6);
+    // graph->addEdge(edge6);
     graph->addEdge(edge7);
     graph->addEdge(edge8);
     graph->addEdge(edge9);
-    graph->addEdge(edge10);
+    // graph->addEdge(edge10);
 
     // 运行 ELK Layered 算法
     ELKLayered elkLayered(graph);

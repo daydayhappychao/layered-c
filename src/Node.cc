@@ -16,8 +16,14 @@
 #include "utils/VectorUtil.h"
 namespace GuiBridge {
 
-Node::Node(std::string name) : name(std::move(name)), side(NodeSide::NONE) {}
-Node::Node(std::string name, NodeSide side) : name(std::move(name)), side(side) {}
+Node::Node(std::string name) : name(std::move(name)), side(NodeSide::NONE) {
+    this->getSize().setX(100);
+    this->getSize().setY(50);
+}
+Node::Node(std::string name, NodeSide side) : name(std::move(name)), side(side) {
+    this->getSize().setX(100);
+    this->getSize().setY(50);
+}
 
 int Node::getId() const { return id; }
 void Node::setId(int id) { this->id = id; }

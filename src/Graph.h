@@ -9,6 +9,7 @@
 #include "Node.h"
 #include "Shape.h"
 #include "math/KVector.h"
+#include "nlohmann/json_fwd.hpp"
 
 namespace GuiBridge {
 
@@ -27,6 +28,7 @@ public:
     KVector getOffset() const;
 
     std::vector<std::vector<std::shared_ptr<Node>>> toNodeArray();
+    nlohmann::json json();
 
 private:
     std::vector<std::shared_ptr<Node>> nodes;
