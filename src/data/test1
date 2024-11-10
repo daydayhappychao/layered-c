@@ -1,0 +1,47 @@
+#       id      displayname         width   height  
+proto   0       "IN_PORT"          1 1 
+proto   1       "OUT_PORT"       1 1 
+proto   2       "BLOCK1"      100 50 
+proto   3       "BLOCK2"        100 50
+proto   4       "BLOCK3"        100 50
+proto   5       "BLOCK4"        100 50
+
+#       id      proto   name    type
+port    0       0       "IN_PORT_PORT"  "out"
+port    1       1       "OUT_PORT_PORT"  "in"
+port    2       2       "BLOCK1_PORT1"  "in"
+port    3       2       "BLOCK1_PORT2"  "in"
+port    4       2       "BLOCK1_PORT3"  "out"
+port    5       3       "BLOCK2_PORT1"  "in"
+port    6       3       "BLOCK2_PORT2"  "out"
+port    7       4       "BLOCK3_PORT1"  "in"
+port    8       4       "BLOCK3_PORT2"  "out"
+port    9       4       "BLOCK3_PORT3"  "out"
+port    10       5       "BLOCK4_PORT1"  "in"
+port    11       5       "BLOCK4_PORT2"  "in"
+port    12       5       "BLOCK4_PORT3"  "in"
+port    13       5       "BLOCK4_PORT4"  "out"
+
+
+
+
+#       id      proto   name
+node    0       0       "IN_PORT_1"
+node    1       0       "IN_PORT_2"
+node    2       1       "OUT_PORT_1"
+node    3       2       "NODE1"
+node    4       4       "NODE2"
+node    5       3       "NODE3"
+node    6       3       "NODE4"
+node    7       5       "NODE5"
+
+#       outnode outpin  innode  inpin
+edge    0       0       3      3
+edge    1       0       3       2
+edge    1       0       4       7
+edge    3       4       5      5
+edge    4       8       7       11
+edge    4       9       6       5
+edge    5       6       7       10
+edge    6       6       7       12
+edge    7       13      2       1

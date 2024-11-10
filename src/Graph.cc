@@ -16,13 +16,7 @@ void Graph::addNode(const std::shared_ptr<Node> &node) {
     node->setGraph(ptr);
 }
 
-void Graph::addEdge(const std::shared_ptr<Edge> &edge) {
-    edges.push_back(edge);
-    auto srcPort = edge->getSrc();
-    auto dstPort = edge->getDst();
-    srcPort->addEdge(edge);
-    dstPort->addEdge(edge);
-}
+void Graph::_addEdge(const std::shared_ptr<Edge> &edge) { edges.push_back(edge); }
 
 std::vector<std::shared_ptr<Node>> &Graph::getNodes() { return nodes; }
 

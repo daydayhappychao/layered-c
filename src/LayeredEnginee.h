@@ -1,6 +1,7 @@
 #ifndef ELK_LAYERED_HPP
 #define ELK_LAYERED_HPP
 
+#include <filesystem>
 #include <memory>
 #include <queue>
 #include <unordered_map>
@@ -11,6 +12,7 @@ namespace GuiBridge {
 class ELKLayered {
 public:
     explicit ELKLayered(std::shared_ptr<Graph> graph);
+    explicit ELKLayered(const std::filesystem::path &path);
     void layered();
     void printLayers();
     void printJson();

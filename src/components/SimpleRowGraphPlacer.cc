@@ -92,8 +92,8 @@ void offsetGraph(std::shared_ptr<Graph> &graph, double offsetX, double offsetY) 
     auto graphOffset = KVector(offsetX, offsetY);
     for (const auto &node : graph->getLayerlessNodes()) {
         node->getPos().add(graphOffset);
-        for (const auto &port : node->getOutputPorts()) {
-            for (const auto &edge : port->getEdges()) {
+        for (auto &port : node->getOutputPorts()) {
+            for (const auto &edge : node->getEdgesByPort(port)) {
                 edge->getBendPoints().offset(graphOffset);
             }
         }

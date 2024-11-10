@@ -16,7 +16,7 @@ namespace GuiBridge {
 class Graph : public std::enable_shared_from_this<Graph>, public Shape {
 public:
     void addNode(const std::shared_ptr<Node> &node);
-    void addEdge(const std::shared_ptr<Edge> &edge);
+    void _addEdge(const std::shared_ptr<Edge> &edge);
     std::vector<std::shared_ptr<Node>> &getNodes();
     std::vector<std::shared_ptr<Edge>> &getEdges();
     std::vector<std::shared_ptr<Layer>> &getLayers();

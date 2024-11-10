@@ -38,8 +38,8 @@ std::shared_ptr<Edge> LongEdgeSplitter::splitEdge(const std::shared_ptr<Edge> &e
     const auto &oldEdgeTarget = edge->getDst();
     auto dummyInputPort = std::make_shared<Port>("dummyInput");
     auto dummyOutPort = std::make_shared<Port>("dummyOut");
-    dummyNode->addInputPort(dummyInputPort);
-    dummyNode->addOutputPort(dummyOutPort);
+    // dummyNode->addInputPort(dummyInputPort);
+    // dummyNode->addOutputPort(dummyOutPort);
 
     edge->setDst(dummyInputPort);
 

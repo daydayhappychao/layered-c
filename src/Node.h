@@ -3,11 +3,13 @@
 #ifndef NODE_HPP
 #define NODE_HPP
 
+#include <map>
 #include <memory>
 #include <optional>
 #include <string>
 #include <vector>
 
+#include "NodeProto.h"
 #include "Shape.h"
 #include "math/Margin.h"
 #include "nlohmann/json_fwd.hpp"
@@ -20,24 +22,34 @@ class Graph;
 class Layer;
 class Edge;
 class Port;
+class EdgeTarget;
 class HiddenNodeConnections;
 
 class Node : public std::enable_shared_from_this<Node>, public Shape {
 public:
-    explicit Node(std::string name);
-    Node(std::string name, NodeSide side);
+    explicit Node(std::string name, std::shared_ptr<NodeProto> &proto);
+    Node(std::string name, NodeSide side, std::shared_ptr<NodeProto> &proto);
     int getId() const;
     void setId(int id);
-    void addInputPort(const std::shared_ptr<Port> &port);
-    void addOutputPort(const std::shared_ptr<Port> &port);
+    // void addInputPort(const std::shared_ptr<Port> &port);
+    // void addOutputPort(const std::shared_ptr<Port> &port);
+
+    // ports 相关
+
     std::vector<std::shared_ptr<Port>> &getInputPorts();
     std::vector<std::shared_ptr<Port>> &getOutputPorts();
     std::vector<std::shared_ptr<Port>> getAllPorts();
     std::vector<std::shared_ptr<Port>> &getPortsByPortType(PortType type);
 
+    // edge相关
+
     std::vector<std::shared_ptr<Edge>> getEdges();
     std::vector<std::shared_ptr<Edge>> getIncomingEdges();
     std::vector<std::shared_ptr<Edge>> getOutgoingEdges();
+    std::vector<std::shared_ptr<Edge>> getEdgesByPort(const std::shared_ptr<Port> &port);
+    void addEdge(std::shared_ptr<Port> &port, std::shared_ptr<Edge> &edge);
+    void addEdge(std::shared_ptr<Port> &fromPort, EdgeTarget &target);
+    void removeEdge(std::shared_ptr<Port> &port, std::shared_ptr<Edge> &edge);
 
     std::shared_ptr<Layer> &getLayer();
     std::shared_ptr<Graph> &getGraph();
@@ -70,10 +82,10 @@ public:
 
 private:
     int id;
-    std::vector<std::shared_ptr<Port>> inputPorts;
-    std::vector<std::shared_ptr<Port>> outputPorts;
+    std::shared_ptr<NodeProto> proto;
     std::shared_ptr<Graph> graph;
     std::shared_ptr<Layer> layer = nullptr;
+    std::map<std::shared_ptr<Port>, std::vector<std::shared_ptr<Edge>>> edges;
 
     NodeSide side;
     HiddenNodeConnections::Connection hiddenNodeConnections = HiddenNodeConnections::Connection::NONE;

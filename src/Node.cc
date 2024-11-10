@@ -16,52 +16,48 @@
 #include "utils/VectorUtil.h"
 namespace GuiBridge {
 
-Node::Node(std::string name) : name(std::move(name)), side(NodeSide::NONE) {
-    this->getSize().setX(100);
-    this->getSize().setY(50);
-}
-Node::Node(std::string name, NodeSide side) : name(std::move(name)), side(side) {
-    this->getSize().setX(100);
-    this->getSize().setY(50);
-}
+Node::Node(std::string name, std::shared_ptr<NodeProto> &proto)
+    : name(std::move(name)), side(NodeSide::NONE), proto(proto) {}
+Node::Node(std::string name, NodeSide side, std::shared_ptr<NodeProto> &proto)
+    : name(std::move(name)), side(side), proto(proto) {}
 
 int Node::getId() const { return id; }
 void Node::setId(int id) { this->id = id; }
 
-void Node::addInputPort(const std::shared_ptr<Port> &port) {
-    if (port->getNode() != nullptr) {
-        throw std::runtime_error("port {} is already used in a node");
-    }
-    if (this->side == NodeSide::FIRST_SEPARATE) {
-        throw std::runtime_error("Cannot add input port to node with side FIRST_SEPARATE");
-    }
-    inputPorts.push_back(port);
-    auto ptr = shared_from_this();
+// void Node::addInputPort(const std::shared_ptr<Port> &port) {
+//     if (port->getNode() != nullptr) {
+//         throw std::runtime_error("port {} is already used in a node");
+//     }
+//     if (this->side == NodeSide::FIRST_SEPARATE) {
+//         throw std::runtime_error("Cannot add input port to node with side FIRST_SEPARATE");
+//     }
+//     inputPorts.push_back(port);
+//     auto ptr = shared_from_this();
 
-    port->setNode(ptr);
-}
+//     port->setNode(ptr);
+// }
 
-void Node::addOutputPort(const std::shared_ptr<Port> &port) {
-    if (port->getNode() != nullptr) {
-        throw std::runtime_error("port {} is already used in a node");
-    }
-    if (this->side == NodeSide::LAST_SEPARATE) {
-        throw std::runtime_error("Cannot add input port to node with side LAST_SEPARATE");
-    }
-    outputPorts.push_back(port);
-    auto ptr = shared_from_this();
+// void Node::addOutputPort(const std::shared_ptr<Port> &port) {
+//     if (port->getNode() != nullptr) {
+//         throw std::runtime_error("port {} is already used in a node");
+//     }
+//     if (this->side == NodeSide::LAST_SEPARATE) {
+//         throw std::runtime_error("Cannot add input port to node with side LAST_SEPARATE");
+//     }
+//     outputPorts.push_back(port);
+//     auto ptr = shared_from_this();
 
-    port->setNode(ptr);
-}
+//     port->setNode(ptr);
+// }
 
-std::vector<std::shared_ptr<Port>> &Node::getInputPorts() { return inputPorts; }
+std::vector<std::shared_ptr<Port>> &Node::getInputPorts() { return proto->inputPorts; }
 
-std::vector<std::shared_ptr<Port>> &Node::getOutputPorts() { return outputPorts; }
+std::vector<std::shared_ptr<Port>> &Node::getOutputPorts() { return proto->outputPorts; }
 
 std::vector<std::shared_ptr<Port>> Node::getAllPorts() {
     std::vector<std::shared_ptr<Port>> allPorts;
-    allPorts.insert(allPorts.end(), outputPorts.begin(), outputPorts.end());
-    allPorts.insert(allPorts.end(), inputPorts.begin(), inputPorts.end());
+    allPorts.insert(allPorts.end(), proto->outputPorts.begin(), proto->outputPorts.end());
+    allPorts.insert(allPorts.end(), proto->inputPorts.begin(), proto->inputPorts.end());
     return allPorts;
 }
 
@@ -75,38 +71,45 @@ std::vector<std::shared_ptr<Port>> &Node::getPortsByPortType(PortType type) {
 }
 
 std::vector<std::shared_ptr<Edge>> Node::getEdges() {
-    std::vector<std::shared_ptr<Edge>> nodeEdges;
-    for (auto &port : inputPorts) {
-        for (const auto &edge : port->getEdges()) {
-            nodeEdges.push_back(edge);
-        }
+    std::vector<std::shared_ptr<Edge>> allEdges;
+    for (const auto &pair : edges) {
+        allEdges.insert(allEdges.end(), pair.second.begin(), pair.second.end());
     }
-    for (auto &port : outputPorts) {
-        for (const auto &edge : port->getEdges()) {
-            nodeEdges.push_back(edge);
-        }
-    }
-    return nodeEdges;
+    return allEdges;
 }
 
 std::vector<std::shared_ptr<Edge>> Node::getIncomingEdges() {
-    std::vector<std::shared_ptr<Edge>> nodeEdges;
-    for (auto &port : inputPorts) {
-        for (const auto &edge : port->getEdges()) {
-            nodeEdges.push_back(edge);
+    std::vector<std::shared_ptr<Edge>> allEdges;
+    for (const auto &pair : edges) {
+        if (vecInclude(proto->inputPorts, pair.first)) {
+            allEdges.insert(allEdges.end(), pair.second.begin(), pair.second.end());
         }
     }
-    return nodeEdges;
+    return allEdges;
 };
 std::vector<std::shared_ptr<Edge>> Node::getOutgoingEdges() {
-    std::vector<std::shared_ptr<Edge>> nodeEdges;
-    for (auto &port : outputPorts) {
-        for (const auto &edge : port->getEdges()) {
-            nodeEdges.push_back(edge);
+    std::vector<std::shared_ptr<Edge>> allEdges;
+    for (const auto &pair : edges) {
+        if (vecInclude(proto->outputPorts, pair.first)) {
+            allEdges.insert(allEdges.end(), pair.second.begin(), pair.second.end());
         }
     }
-    return nodeEdges;
+    return allEdges;
 };
+
+std::vector<std::shared_ptr<Edge>> Node::getEdgesByPort(const std::shared_ptr<Port> &port) {
+    return edges.contains(port) ? edges.at(port) : std::vector<std::shared_ptr<Edge>>{};
+};
+
+void Node::addEdge(std::shared_ptr<Port> &port, std::shared_ptr<Edge> &edge) {
+    /**
+     * @todo
+     * 这里加一个判断, 如果已存在则 throw error
+     */
+    edges[port].emplace_back(edge);
+}
+
+void Node::removeEdge(std::shared_ptr<Port> &port, std::shared_ptr<Edge> &edge) { vecRemove(edges[port], edge); }
 
 std::shared_ptr<Layer> &Node::getLayer() { return layer; }
 
@@ -143,8 +146,8 @@ nlohmann::json Node::json() {
     res["name"] = name;
     res["x"] = getPos().x;
     res["y"] = getPos().y;
-    res["width"] = getSize().x;
-    res["height"] = getSize().y;
+    res["width"] = proto->getSize().x;
+    res["height"] = proto->getSize().y;
     return res;
 }
 }  // namespace GuiBridge

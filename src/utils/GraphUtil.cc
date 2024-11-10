@@ -30,11 +30,11 @@ std::shared_ptr<Port> provideCollectorPort(const std::shared_ptr<Graph> &graph, 
 
     std::shared_ptr<Port> ptr(&port);
 
-    if (type == PortType::INPUT) {
-        node->addInputPort(ptr);
-    } else if (type == PortType::OUTPUT) {
-        node->addOutputPort(ptr);
-    }
+    // if (type == PortType::INPUT) {
+    //     node->addInputPort(ptr);
+    // } else if (type == PortType::OUTPUT) {
+    //     node->addOutputPort(ptr);
+    // }
     return ptr;
 }
 }  // namespace GuiBridge

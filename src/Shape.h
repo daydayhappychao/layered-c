@@ -12,7 +12,7 @@ public:
     KVector &getPos();
     KVector &getSize();
 
-private:
+protected:
     KVector pos = KVector();
     KVector size = KVector();
 };
