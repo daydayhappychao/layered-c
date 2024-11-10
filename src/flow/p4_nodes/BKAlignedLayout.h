@@ -10,6 +10,7 @@ class Graph;
 class NeighborhoodInformation;
 class Node;
 class Port;
+class EdgeTarget;
 
 enum class VDirection { DOWN, UP };
 enum class HDirection { RIGHT, LEFT };
@@ -19,7 +20,7 @@ public:
     BKAlignedLayout(std::shared_ptr<Graph> &layeredGraph, int nodeCount, VDirection vdir, HDirection hdir);
     void cleanup();
     double layoutSize();
-    double calculateDelta(std::shared_ptr<Port> &src, std::shared_ptr<Port> &tgt);
+    double calculateDelta(EdgeTarget &src, EdgeTarget &tgt);
     void shiftBlock(std::shared_ptr<Node> &rootNode, double delta);
     double checkSpaceAbove(std::shared_ptr<Node> &blockRoot, double delta,
                            std::shared_ptr<NeighborhoodInformation> &ni);

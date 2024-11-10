@@ -27,8 +27,8 @@ class HiddenNodeConnections;
 
 class Node : public std::enable_shared_from_this<Node>, public Shape {
 public:
-    explicit Node(std::string name, std::shared_ptr<NodeProto> &proto);
-    Node(std::string name, NodeSide side, std::shared_ptr<NodeProto> &proto);
+    explicit Node(std::string name, std::shared_ptr<NodeProto> &proto, int _id);
+    Node(std::string name, std::shared_ptr<NodeProto> &proto, int _id, NodeSide side);
     int getId() const;
     void setId(int id);
     // void addInputPort(const std::shared_ptr<Port> &port);
@@ -40,6 +40,8 @@ public:
     std::vector<std::shared_ptr<Port>> &getOutputPorts();
     std::vector<std::shared_ptr<Port>> getAllPorts();
     std::vector<std::shared_ptr<Port>> &getPortsByPortType(PortType type);
+    // 寻找与该 port 连接的 port
+    std::vector<EdgeTarget> getConnectedPorts(std::shared_ptr<Port> &port);
 
     // edge相关
 
@@ -48,7 +50,7 @@ public:
     std::vector<std::shared_ptr<Edge>> getOutgoingEdges();
     std::vector<std::shared_ptr<Edge>> getEdgesByPort(const std::shared_ptr<Port> &port);
     void addEdge(std::shared_ptr<Port> &port, std::shared_ptr<Edge> &edge);
-    void addEdge(std::shared_ptr<Port> &fromPort, EdgeTarget &target);
+    // void addEdge(std::shared_ptr<Port> &fromPort, EdgeTarget &target);
     void removeEdge(std::shared_ptr<Port> &port, std::shared_ptr<Edge> &edge);
 
     std::shared_ptr<Layer> &getLayer();
@@ -80,6 +82,9 @@ public:
     Margin margin;
     std::string name;
 
+    // 最初的id
+    int _id;
+
 private:
     int id;
     std::shared_ptr<NodeProto> proto;
@@ -89,6 +94,8 @@ private:
 
     NodeSide side;
     HiddenNodeConnections::Connection hiddenNodeConnections = HiddenNodeConnections::Connection::NONE;
+
+    
 };
 }  // namespace GuiBridge
 #endif  // NODE_HPP

@@ -16,10 +16,10 @@
 #include "utils/VectorUtil.h"
 namespace GuiBridge {
 
-Node::Node(std::string name, std::shared_ptr<NodeProto> &proto)
-    : name(std::move(name)), side(NodeSide::NONE), proto(proto) {}
-Node::Node(std::string name, NodeSide side, std::shared_ptr<NodeProto> &proto)
-    : name(std::move(name)), side(side), proto(proto) {}
+Node::Node(std::string name, std::shared_ptr<NodeProto> &proto, int _id)
+    : name(std::move(name)), side(NodeSide::NONE), proto(proto), _id(_id) {}
+Node::Node(std::string name, std::shared_ptr<NodeProto> &proto, int _id, NodeSide side)
+    : name(std::move(name)), side(side), proto(proto), _id(_id) {}
 
 int Node::getId() const { return id; }
 void Node::setId(int id) { this->id = id; }
@@ -70,6 +70,16 @@ std::vector<std::shared_ptr<Port>> &Node::getPortsByPortType(PortType type) {
     }
 }
 
+std::vector<EdgeTarget> Node::getConnectedPorts(std::shared_ptr<Port> &port) {
+    auto edgeData = edges.at(port);
+    std::vector<EdgeTarget> connectedPorts;
+    auto thisPtr = shared_from_this();
+    for (auto &edge : edgeData) {
+        connectedPorts.emplace_back(edge->getOther(thisPtr));
+    }
+    return connectedPorts;
+};
+
 std::vector<std::shared_ptr<Edge>> Node::getEdges() {
     std::vector<std::shared_ptr<Edge>> allEdges;
     for (const auto &pair : edges) {
@@ -98,7 +108,7 @@ std::vector<std::shared_ptr<Edge>> Node::getOutgoingEdges() {
 };
 
 std::vector<std::shared_ptr<Edge>> Node::getEdgesByPort(const std::shared_ptr<Port> &port) {
-    return edges.contains(port) ? edges.at(port) : std::vector<std::shared_ptr<Edge>>{};
+    return edges.find(port) != edges.end() ? edges.at(port) : std::vector<std::shared_ptr<Edge>>{};
 };
 
 void Node::addEdge(std::shared_ptr<Port> &port, std::shared_ptr<Edge> &edge) {

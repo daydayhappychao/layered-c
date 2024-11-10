@@ -11,13 +11,14 @@ NodeProto::NodeProto(std::string name, double width, double height, int id) : na
     this->size.setY(height);
 }
 
-void NodeProto::addPort(std::string portName, PortType portType) {
-    auto port = std::make_shared<Port>(portName, portType);
+std::shared_ptr<Port> NodeProto::addPort(std::string portName, int id, PortType portType) {
+    auto port = std::make_shared<Port>(portName, id, portType);
     port->nodeProto = shared_from_this();
     if (portType == PortType::INPUT) {
         inputPorts.emplace_back(port);
     } else {
         outputPorts.emplace_back(port);
     }
+    return port;
 }
 }  // namespace GuiBridge

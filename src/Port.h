@@ -16,7 +16,7 @@ class Edge;
 class NodeProto;
 class Port : public std::enable_shared_from_this<Port>, public Shape {
 public:
-    explicit Port(std::string name, PortType portType);
+    explicit Port(std::string name, int _id, PortType portType);
 
     // std::shared_ptr<Node> getNode();
     // void setNode(const std::shared_ptr<Node> &node);
@@ -40,7 +40,10 @@ public:
 
     nlohmann::json json();
 
+    // 这个id经常会变，只能用作算法中辅助，后续优化掉
     int id;
+    // graph 中的唯一 id
+    int _id;
     std::string name;
 
 private:

@@ -1,17 +1,22 @@
 #include "LayeredEnginee.h"
 
+#include <algorithm>
 #include <cstdio>
 #include <fstream>
+#include <iomanip>
 #include <iostream>
 #include <memory>
 #include <nlohmann/json.hpp>
 #include <ostream>
+#include <stdexcept>
+#include <string>
 #include <utility>
 
 #include "./flow/p1_cycle_breaking/GreedyCycleBreaker.h"
 #include "./flow/p4_nodes/BKNodePlacer.h"
 #include "./utils/ComponentsProcessor.h"
 #include "Graph.h"
+#include "NodeProto.h"
 #include "Port.h"
 #include "flow/intermediate/LayerConstraintPostprocessor.h"
 #include "flow/intermediate/LayerConstraintPreprocessor.h"
@@ -20,6 +25,8 @@
 #include "flow/p3_crossing_minimization/LayerSweepCrossingMinimizer.h"
 #include "flow/p3_crossing_minimization/LongEdgeSplitter.h"
 #include "opts/CrossMinType.h"
+#include "opts/PortType.h"
+#include "utils/VectorUtil.h"
 
 namespace GuiBridge {
 
@@ -36,48 +43,39 @@ ELKLayered::ELKLayered(const std::filesystem::path &path) {
         // ignore comment lines
         if (buf == "#") {
             std::getline(in, buf);
-        } else if (buf == "canvas") {
-            in >> g.size.x() >> g.size.y();
-            // LOG(info, "Canvas Si/ze: {}, {}", g.size.x(), g.size.y());
         } else if (buf == "proto") {
-            std::size_t id;
+            int id;
             std::string display_name;
-            Vector2f size;
-            std::size_t in_pins, out_pins;
-            in >> id >> std::quoted(display_name) >> size.x() >> size.y() >> in_pins >> out_pins;
-            assert(g.prototypes.size() == id);
-            g.prototypes.emplace_back(display_name, size, in_pins, out_pins);
-            // LOG(info, "Node Prototype: #{} ({}) <{}, {}> {}:{}",
-            //     id, display_name, size.x(), size.y(), in_pins, out_pins
-            // );
+            int width;
+            int height;
+            in >> id >> std::quoted(display_name) >> width >> height;
+
+            graph->addNodeProto(display_name, width, height, id);
+        } else if (buf == "port") {
+            int id;
+            int protoId;
+            std::string name;
+            std::string type;
+            in >> id >> protoId >> std::quoted(name) >> std::quoted(type);
+            PortType portType = type == "in" ? PortType::INPUT : PortType::OUTPUT;
+            graph->addPort(name, id, portType, protoId);
+
         } else if (buf == "node") {
             std::size_t id;
             std::size_t proto;
             std::string name;
-            in >> id >> proto >> std::quoted(name);
-            assert(g.nodes.size() == id);
-            assert(proto < g.prototypes.size());
-            g.nodes.emplace_back(&g.prototypes[proto], name);
-            // LOG(info, "Node: #{}({}) <- {}",
-            //     id, name, g.prototypes[proto].name
-            // );
-        } else if (buf == "link") {
-            std::size_t out_node, out_pin, in_node, in_pin;
+            graph->addNode(id, proto, name);
+        } else if (buf == "edge") {
+            int out_node;
+            int out_pin;
+            int in_node;
+            int in_pin;
             in >> out_node >> out_pin >> in_node >> in_pin;
-            assert(out_node < g.nodes.size());
-            assert(out_pin < g.nodes[out_node].prototype->out_ports.size());
-            assert(in_node < g.nodes.size());
-            assert(in_pin < g.nodes[in_node].prototype->in_ports.size());
-            g.links.emplace_back(out_node, out_pin, in_node, in_pin);
-            // LOG(info, "Link: {}:{}->{}:{}",
-            //     out_node, out_pin, in_node, in_pin
-            // );
+            graph->addEdge(out_node, out_pin, in_node, in_pin);
         } else {
             assert(false);
         }
     }
-
-    return g;
 }
 
 void ELKLayered::layered() {

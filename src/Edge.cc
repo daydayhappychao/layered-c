@@ -129,6 +129,30 @@ KVectorChain Edge::getBendPoints() { return bendPoints; }
 
 bool Edge::isInLayerEdge() { return srcNode.lock()->getLayer() == dstNode.lock()->getLayer(); }
 
+void Edge::hidden() {
+    if (isHidden) {
+        return;
+    }
+    isHidden = true;
+    auto thisPtr = shared_from_this();
+    auto srcPortPtr = srcPort.lock();
+    srcNode.lock()->removeEdge(srcPortPtr, thisPtr);
+    auto dstPortPtr = dstPort.lock();
+    dstNode.lock()->removeEdge(dstPortPtr, thisPtr);
+}
+
+void Edge::show() {
+    if (!isHidden) {
+        return;
+    }
+    isHidden = false;
+    auto edge = shared_from_this();
+    auto portPtr = getSrc().port;
+    getSrc().node->addEdge(portPtr, edge);
+    auto dstPortPtr = getDst().port;
+    getDst().node->addEdge(dstPortPtr, edge);
+}
+
 nlohmann::json Edge::json() {
     nlohmann::json res;
     res["src"] = srcNode.lock()->name;

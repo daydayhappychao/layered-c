@@ -61,6 +61,15 @@ public:
     int delta = 1;
     int weight = 1;
 
+    // 隐藏相关
+
+    // 是否隐藏
+    bool isHidden = false;
+    // 设置状态为隐藏，在node中不再有该edge信息
+    void hidden();
+    // 恢复状态为显示，在node中保存该 edge 信息
+    void show();
+
 private:
     std::weak_ptr<Node> srcNode;
     std::weak_ptr<Port> srcPort;

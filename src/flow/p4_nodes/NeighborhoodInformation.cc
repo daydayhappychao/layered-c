@@ -54,7 +54,7 @@ void NeighborhoodInformation::determineAllRightNeighbors(const std::shared_ptr<N
                 if (edge->isInLayerEdge()) {
                     continue;
                 }
-                Neighbor ptr = std::make_pair(edge->getDst()->getNode(), edge);
+                Neighbor ptr = std::make_pair(edge->getDst().node, edge);
                 result.emplace_back(ptr);
             }
             std::sort(result.begin(), result.end(), [ni](Neighbor &o1, Neighbor &o2) {
@@ -75,7 +75,7 @@ void NeighborhoodInformation::determineAllLeftNeighbors(const std::shared_ptr<Ne
                 if (edge->isInLayerEdge()) {
                     continue;
                 }
-                Neighbor ptr = std::make_pair(edge->getSrc()->getNode(), edge);
+                Neighbor ptr = std::make_pair(edge->getSrc().node, edge);
                 result.emplace_back(ptr);
             }
             std::sort(result.begin(), result.end(), [ni](Neighbor &o1, Neighbor &o2) {

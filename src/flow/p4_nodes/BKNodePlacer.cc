@@ -192,8 +192,8 @@ std::shared_ptr<BKAlignedLayout> BKNodePlacer::createBalancedLayout(
 bool BKNodePlacer::incidentToInnerSegment(std::shared_ptr<Node> &node, int layer1, int layer2) {
     if (node->isDummy) {
         for (auto &edge : node->getIncomingEdges()) {
-            auto srcNode = edge->getSrc()->getNode();
-            if (srcNode->isDummy && ni->layerIndex[edge->getSrc()->getNode()->getLayer()->id] == layer2 &&
+            auto srcNode = edge->getSrc().node;
+            if (srcNode->isDummy && ni->layerIndex[edge->getSrc().node->getLayer()->id] == layer2 &&
                 ni->layerIndex[node->getLayer()->id] == layer1) {
                 return true;
             }
@@ -204,7 +204,7 @@ bool BKNodePlacer::incidentToInnerSegment(std::shared_ptr<Node> &node, int layer
 
 std::shared_ptr<Edge> BKNodePlacer::getEdge(std::shared_ptr<Node> &source, std::shared_ptr<Node> &target) {
     for (auto &edge : source->getEdges()) {
-        if (edge->getDst()->getNode() == target || (edge->getSrc()->getNode() == target)) {
+        if (edge->getDst().node == target || (edge->getSrc().node == target)) {
             return edge;
         }
     }

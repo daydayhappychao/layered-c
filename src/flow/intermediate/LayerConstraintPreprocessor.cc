@@ -39,11 +39,11 @@ void LayerConstraintPreprocessor::hide(std::shared_ptr<Node> &node) {
     }
 };
 void LayerConstraintPreprocessor::hide(std::shared_ptr<Node> &node, std::shared_ptr<Edge> &edge) {
-    bool isOutgoing = edge->getSrc()->getNode() == node;
+    bool isOutgoing = edge->getSrc().node == node;
     OppositeType oppositeType = isOutgoing ? Dst : Src;
-    std::shared_ptr<Port> oppositePort = edge->setOppositePort(oppositeType);
-    auto oppositeNode = oppositePort->getNode();
+    auto oppositeNode = edge->getOther(node).node;
     updateOppositeNodeLayerConstraints(node, oppositeNode);
+    edge->hidden();
 };
 
 void LayerConstraintPreprocessor::updateOppositeNodeLayerConstraints(std::shared_ptr<Node> &hiddenNode,

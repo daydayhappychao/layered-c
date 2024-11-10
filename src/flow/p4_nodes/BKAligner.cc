@@ -100,11 +100,11 @@ void BKAligner::insideBlockShift(std::shared_ptr<BKAlignedLayout> &bal) {
 
             double portPosDiff = 0.0;
             if (bal->hdir == HDirection::LEFT) {
-                portPosDiff = edge->getDst()->getPos().y + edge->getDst()->getAnchor().y - edge->getSrc()->getPos().y -
-                              edge->getSrc()->getAnchor().y;
+                portPosDiff = edge->getDst().port->getPos().y + edge->getDst().port->getAnchor().y -
+                              edge->getSrc().port->getPos().y - edge->getSrc().port->getAnchor().y;
             } else {
-                portPosDiff = edge->getSrc()->getPos().y + edge->getSrc()->getAnchor().y - edge->getDst()->getPos().y -
-                              edge->getDst()->getAnchor().y;
+                portPosDiff = edge->getSrc().port->getPos().y + edge->getSrc().port->getAnchor().y -
+                              edge->getDst().port->getPos().y - edge->getDst().port->getAnchor().y;
             }
 
             double nextInnerShift = bal->innerShift[current->getId()] + portPosDiff;

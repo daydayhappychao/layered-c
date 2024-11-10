@@ -26,11 +26,8 @@ void LayerConstraintPostprocessor::process(std::shared_ptr<Graph> &graph) {
             layers.emplace_back(lastSeparateLayer);
         }
     }
-    // 新增逻辑，在这里把翻转的 edge 翻转回来
     for (auto &edge : graph->getEdges()) {
-        if (edge->reversed) {
-            edge->reverse(graph, false);
-        }
+        edge->show();
     }
 }
 
@@ -74,15 +71,9 @@ void LayerConstraintPostprocessor::restoreHiddenNodes(std::shared_ptr<Graph> &gr
         switch (node->getSide()) {
             case NodeSide::FIRST_SEPARATE:
                 node->setLayer(firstSeparateLayer);
-                for (const auto &edges : node->getOutgoingEdges()) {
-                    edges->revertOppositePort();
-                }
                 break;
             case NodeSide::LAST_SEPARATE:
                 node->setLayer(lastSeparateLayer);
-                for (const auto &edges : node->getIncomingEdges()) {
-                    edges->revertOppositePort();
-                }
                 break;
             case NodeSide::FIRST:
             case NodeSide::LAST:

@@ -10,7 +10,7 @@
 
 namespace GuiBridge {
 
-Port::Port(std::string name, PortType portType) : name(std::move(name)), portType(portType) {}
+Port::Port(std::string name, int _id, PortType portType) : name(std::move(name)), portType(portType), _id(_id) {}
 
 KVector Port::getAnchor() { return anchor; }
 

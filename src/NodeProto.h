@@ -16,7 +16,7 @@ public:
     std::string name;
     int id;
 
-    void addPort(std::string portName, PortType portType);
+    std::shared_ptr<Port> addPort(std::string portName, int id, PortType portType);
 
 private:
 };

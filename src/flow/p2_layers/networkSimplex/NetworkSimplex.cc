@@ -59,13 +59,15 @@ void NetworkSimplex::removeSubtrees() {
         }
         std::shared_ptr<Edge> edge = node->getEdges()[0];
         bool isOutEdge = !node->getOutgoingEdges().empty();
-        std::shared_ptr<Node> other = edge->getOther(node)->getNode();
+        std::shared_ptr<Node> other = edge->getOther(node).node;
 
-        if (isOutEdge) {
-            edge->setOppositePort(OppositeType::Dst);
-        } else {
-            edge->setOppositePort(OppositeType::Src);
-        }
+        // if (isOutEdge) {
+        //     edge->setOppositePort(OppositeType::Dst);
+        // } else {
+        //     edge->setOppositePort(OppositeType::Src);
+        // }
+
+        edge->hidden();
 
         if (other->getEdges().size() == 1) {
             leafs.push(other);
@@ -132,9 +134,9 @@ void NetworkSimplex::feasibleTree() {
         std::fill(edgeVisited.begin(), edgeVisited.end(), false);
         while (tightTreeDFS(graph->getLayerlessNodes().front()) < graph->getLayerlessNodes().size()) {
             auto e = minimalSlack();
-            int slack = e->getDst()->getNode()->layerIndex - e->getSrc()->getNode()->layerIndex - e->delta;
+            int slack = e->getDst().node->layerIndex - e->getSrc().node->layerIndex - e->delta;
 
-            if (e->getDst()->getNode()->treeNode) {
+            if (e->getDst().node->treeNode) {
                 slack = -slack;
             }
             for (const auto &node : graph->getLayerlessNodes()) {
@@ -167,7 +169,7 @@ void NetworkSimplex::layeringTopologicalNumbering() {
         roots.pop();
 
         for (auto const &edge : node->getOutgoingEdges()) {
-            auto target = edge->getDst()->getNode();
+            auto target = edge->getDst().node;
             target->layerIndex = std::max(target->layerIndex, node->layerIndex + edge->delta);
             incident[target->internalId]--;
             if (incident[target->internalId] == 0) {
@@ -185,11 +187,11 @@ int NetworkSimplex::tightTreeDFS(const std::shared_ptr<Node> &node) {
     for (const auto &edge : node->getEdges()) {
         if (!edgeVisited[edge->internalId]) {
             edgeVisited[edge->internalId] = true;
-            opposite = edge->getOther(node)->getNode();
+            opposite = edge->getOther(node).node;
             if (edge->treeEdge) {
                 nodeCount += tightTreeDFS(opposite);
             } else if (!opposite->treeNode &&
-                       edge->delta == edge->getDst()->getNode()->layerIndex - edge->getSrc()->getNode()->layerIndex) {
+                       edge->delta == edge->getDst().node->layerIndex - edge->getSrc().node->layerIndex) {
                 edge->treeEdge = true;
                 treeEdges.insert(edge);
                 nodeCount += tightTreeDFS(opposite);
@@ -204,7 +206,7 @@ int NetworkSimplex::postorderTraversal(const std::shared_ptr<Node> &node) {
     for (const auto &edge : node->getEdges()) {
         if (edge->treeEdge && !edgeVisited[edge->internalId]) {
             edgeVisited[edge->internalId] = true;
-            lowest = std::min(lowest, postorderTraversal(edge->getOther(node)->getNode()));
+            lowest = std::min(lowest, postorderTraversal(edge->getOther(node).node));
         }
     }
     poID[node->internalId] = postOrder;
@@ -237,25 +239,25 @@ void NetworkSimplex::cutvalues() {
         while (node->unknownCutvalues.size() == 1) {
             toDetermine = node->unknownCutvalues.front();
             cutvalue[toDetermine->internalId] = toDetermine->weight;
-            source = toDetermine->getSrc()->getNode();
-            target = toDetermine->getDst()->getNode();
+            source = toDetermine->getSrc().node;
+            target = toDetermine->getDst().node;
             for (const auto &edge : node->getEdges()) {
                 if (edge != toDetermine) {
                     if (edge->treeEdge) {
-                        if (source == edge->getSrc()->getNode() || target == edge->getDst()->getNode()) {
+                        if (source == edge->getSrc().node || target == edge->getDst().node) {
                             cutvalue[toDetermine->internalId] -= cutvalue[edge->internalId] - edge->weight;
                         } else {
                             cutvalue[toDetermine->internalId] += cutvalue[edge->internalId] - edge->weight;
                         }
                     } else {
                         if (node == source) {
-                            if (edge->getSrc()->getNode() == node) {
+                            if (edge->getSrc().node == node) {
                                 cutvalue[toDetermine->internalId] += edge->weight;
                             } else {
                                 cutvalue[toDetermine->internalId] -= edge->weight;
                             }
                         } else {
-                            if (edge->getSrc()->getNode() == node) {
+                            if (edge->getSrc().node == node) {
                                 cutvalue[toDetermine->internalId] -= edge->weight;
                             } else {
                                 cutvalue[toDetermine->internalId] += edge->weight;
@@ -268,9 +270,9 @@ void NetworkSimplex::cutvalues() {
             vecRemove(target->unknownCutvalues, toDetermine);
 
             if (source == node) {
-                node = toDetermine->getDst()->getNode();
+                node = toDetermine->getDst().node;
             } else {
-                node = toDetermine->getSrc()->getNode();
+                node = toDetermine->getSrc().node;
             }
         }
     }
@@ -298,8 +300,8 @@ void NetworkSimplex::exchange(const std::shared_ptr<Edge> &leave, const std::sha
     enter->treeEdge = true;
     treeEdges.insert(enter);
 
-    int delta = enter->getDst()->getNode()->layerIndex - enter->getSrc()->getNode()->layerIndex - enter->delta;
-    if (!isInHead(enter->getDst()->getNode(), leave)) {
+    int delta = enter->getDst().node->layerIndex - enter->getSrc().node->layerIndex - enter->delta;
+    if (!isInHead(enter->getDst().node, leave)) {
         delta = -delta;
     }
     for (const auto &node : graph->getLayerlessNodes()) {
@@ -315,8 +317,8 @@ void NetworkSimplex::exchange(const std::shared_ptr<Edge> &leave, const std::sha
 }
 
 bool NetworkSimplex::isInHead(const std::shared_ptr<Node> &node, const std::shared_ptr<Edge> &edge) {
-    auto source = edge->getSrc()->getNode();
-    auto target = edge->getDst()->getNode();
+    auto source = edge->getSrc().node;
+    auto target = edge->getDst().node;
 
     if (lowestPoID[source->internalId] <= poID[node->internalId] &&
         poID[node->internalId] <= poID[source->internalId] &&
@@ -336,8 +338,8 @@ std::shared_ptr<Edge> NetworkSimplex::enterEdge(const std::shared_ptr<Edge> &lea
     std::shared_ptr<Node> source;
     std::shared_ptr<Node> target;
     for (const auto &edge : edges) {
-        source = edge->getSrc()->getNode();
-        target = edge->getDst()->getNode();
+        source = edge->getSrc().node;
+        target = edge->getDst().node;
         if (isInHead(source, leave) && !isInHead(target, leave)) {
             slack = target->layerIndex - source->layerIndex - edge->delta;
             if (slack < repSlack) {
@@ -395,8 +397,8 @@ std::pair<int, int> NetworkSimplex::minimalSpan(const std::shared_ptr<Node> &nod
     int currentSpan;
 
     for (const auto &edge : node->getEdges()) {
-        currentSpan = edge->getDst()->getNode()->layerIndex - edge->getSrc()->getNode()->layerIndex;
-        if (edge->getDst()->getNode() == node && currentSpan < minSpanIn) {
+        currentSpan = edge->getDst().node->layerIndex - edge->getSrc().node->layerIndex;
+        if (edge->getDst().node == node && currentSpan < minSpanIn) {
             minSpanIn = currentSpan;
         } else if (currentSpan < minSpanOut) {
             minSpanOut = currentSpan;
@@ -421,8 +423,8 @@ std::shared_ptr<Edge> NetworkSimplex::minimalSlack() {
     int curSlack;
 
     for (const auto &edge : edges) {
-        if (edge->getSrc()->getNode()->treeNode ^ edge->getDst()->getNode()->treeNode) {
-            curSlack = edge->getDst()->getNode()->layerIndex - edge->getSrc()->getNode()->layerIndex - edge->delta;
+        if (edge->getSrc().node->treeNode ^ edge->getDst().node->treeNode) {
+            curSlack = edge->getDst().node->layerIndex - edge->getSrc().node->layerIndex - edge->delta;
             if (curSlack < minSlack) {
                 minSlack = curSlack;
                 minSlackEdge = edge;

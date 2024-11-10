@@ -1,22 +1,74 @@
 #include "Graph.h"
 
 #include <memory>
+#include <stdexcept>
+#include <utility>
 #include <vector>
 
+#include "Edge.h"
 #include "Layer.h"
 #include "Node.h"
 #include "nlohmann/json.hpp"
+#include "utils/VectorUtil.h"
 
 namespace GuiBridge {
 
+std::shared_ptr<NodeProto> Graph::getProtoById(int id) {
+    auto protoPtr = vecFind(getNodeProtos(), [id](const std::shared_ptr<NodeProto> &proto) { return proto->id == id; });
+    if (!protoPtr.has_value()) {
+        throw std::runtime_error("对应的 NodeProto 不存在");
+    }
+    auto protoPtrValue = protoPtr.value();
+    return protoPtrValue;
+}
+
+void Graph::addNodeProto(const std::shared_ptr<NodeProto> &nodeProto) { nodeProtos.emplace_back(nodeProto); }
+void Graph::addNodeProto(std::string name, double width, double height, int id) {
+    auto nodeProto = std::make_shared<NodeProto>(name, width, height, id);
+    addNodeProto(nodeProto);
+};
+
+void Graph::addPort(std::string name, int id, PortType portType, int protoId) {
+    auto protoPtr = getProtoById(id);
+    auto portPtr = protoPtr->addPort(std::move(name), id, portType);
+    ports.emplace_back(portPtr);
+}
+
 void Graph::addNode(const std::shared_ptr<Node> &node) {
     nodes.push_back(node);
-    layerlessNodes.push_back(node);
+    layerlessNodes.emplace_back(node);
     auto ptr = shared_from_this();
     node->setGraph(ptr);
 }
+void Graph::addNode(int id, int protoId, std::string name) {
+    auto protoPtr = getProtoById(protoId);
+    auto nodePtr = std::make_shared<Node>(name, protoPtr, id);
+    addNode(nodePtr);
+}
 
-void Graph::_addEdge(const std::shared_ptr<Edge> &edge) { edges.push_back(edge); }
+void Graph::addEdge(std::shared_ptr<Edge> &edge) {
+    auto portPtr = edge->getSrc().port;
+    edge->getSrc().node->addEdge(portPtr, edge);
+    auto dstPortPtr = edge->getDst().port;
+    edge->getDst().node->addEdge(dstPortPtr, edge);
+    edges.emplace_back(edge);
+};
+void Graph::addEdge(std::shared_ptr<Node> &srcNode, std::shared_ptr<Port> &srcPort, std::shared_ptr<Node> &dstNode,
+                    std::shared_ptr<Port> &dstPort) {
+    auto edge = std::make_shared<Edge>(srcNode, srcPort, dstNode, dstPort);
+    addEdge(edge);
+};
+void Graph::addEdge(int srcNodeId, int srcPortId, int dstNodeId, int dstPortId) {
+    auto srcNode = vecFind(nodes, [srcNodeId](std::shared_ptr<Node> &node) { return node->_id == srcNodeId; });
+    auto srcPort = vecFind(ports, [srcPortId](std::shared_ptr<Port> &port) { return port->_id == srcPortId; });
+    auto dstNode = vecFind(nodes, [dstNodeId](std::shared_ptr<Node> &node) { return node->_id == dstNodeId; });
+    auto dstPort = vecFind(ports, [dstPortId](std::shared_ptr<Port> &port) { return port->_id == dstPortId; });
+    if (srcNode.has_value() && srcPort.has_value() && dstNode.has_value() && dstPort.has_value()) {
+        addEdge(srcNode.value(), srcPort.value(), dstNode.value(), dstPort.value());
+    } else {
+        throw std::runtime_error("edge 数据不合法");
+    }
+};
 
 std::vector<std::shared_ptr<Node>> &Graph::getNodes() { return nodes; }
 
@@ -30,9 +82,6 @@ void Graph::addLayers(const std::shared_ptr<Layer> &layer) { layers.emplace_back
 void Graph::setHiddenNodes(std::vector<std::shared_ptr<Node>> &nodes) { hiddenNodes = nodes; };
 
 std::vector<std::shared_ptr<Node>> &Graph::getHiddenNodes() { return hiddenNodes; };
-
-KVector Graph::getSize() const { return size; };
-KVector Graph::getOffset() const { return offset; };
 
 std::vector<std::vector<std::shared_ptr<Node>>> Graph::toNodeArray() {
     std::vector<std::vector<std::shared_ptr<Node>>> nodeArray(this->layers.size());

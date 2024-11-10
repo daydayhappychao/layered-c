@@ -24,9 +24,9 @@ std::optional<DfsDataType> ComponentsProcessor::dfs(const std::shared_ptr<Node> 
 
         data->first.push_back(node);
 
-        for (const auto &port1 : node->getAllPorts()) {
-            for (const auto &port2 : port1->getConnectedPorts()) {
-                dfs(port2->getNode(), data);
+        for (auto &port1 : node->getAllPorts()) {
+            for (const auto &port2 : node->getConnectedPorts(port1)) {
+                dfs(port2.node, data);
             }
         }
         return data;

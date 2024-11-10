@@ -1,5 +1,7 @@
 #ifndef VECTOR_UTIL_HPP
 #define VECTOR_UTIL_HPP
+#include <algorithm>
+#include <optional>
 #include <vector>
 namespace GuiBridge {
 template <typename T>
@@ -19,5 +21,16 @@ template <typename T>
 void vecAddAll(std::vector<T> &target, const std::vector<T> &source) {
     target.insert(target.end(), source.begin(), source.end());
 }
+
+template <typename T, typename Predicate>
+std::optional<T> vecFind(const std::vector<T> &items, Predicate predicate) {
+    auto it = std::find_if(items.begin(), items.end(), predicate);
+
+    if (it != items.end()) {
+        return *it;  // 返回找到的元素
+    }
+    return std::nullopt;  // 未找到则返回 std::nullopt
+}
+
 }  // namespace GuiBridge
 #endif

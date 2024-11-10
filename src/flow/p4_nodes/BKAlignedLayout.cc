@@ -42,11 +42,11 @@ double BKAlignedLayout::layoutSize() {
     return max - min;
 }
 
-double BKAlignedLayout::calculateDelta(std::shared_ptr<Port> &src, std::shared_ptr<Port> &tgt) {
+double BKAlignedLayout::calculateDelta(EdgeTarget &src, EdgeTarget &tgt) {
     double srcPos =
-        y[src->getNode()->getId()] + innerShift[src->getNode()->getId()] + src->getPos().y + src->getAnchor().y;
+        y[src.node->getId()] + innerShift[src.node->getId()] + src.port->getPos().y + src.port->getAnchor().y;
     double tgtPos =
-        y[tgt->getNode()->getId()] + innerShift[tgt->getNode()->getId()] + tgt->getPos().y + tgt->getAnchor().y;
+        y[tgt.node->getId()] + innerShift[tgt.node->getId()] + tgt.port->getPos().y + tgt.port->getAnchor().y;
     return tgtPos - srcPos;
 }
 

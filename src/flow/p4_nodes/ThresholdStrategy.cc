@@ -16,11 +16,11 @@ void ThresholdStrategy::init(std::shared_ptr<BKAlignedLayout> &theBal,
 void ThresholdStrategy::finishBlock(std::shared_ptr<Node> &n) { blockFinished.insert(n); }
 
 std::shared_ptr<Node> ThresholdStrategy::getOther(std::shared_ptr<Edge> &edge, std::shared_ptr<Node> &n) {
-    if (edge->getSrc()->getNode() == n) {
-        return edge->getDst()->getNode();
+    if (edge->getSrc().node == n) {
+        return edge->getDst().node;
     }
-    if (edge->getDst()->getNode() == n) {
-        return edge->getSrc()->getNode();
+    if (edge->getDst().node == n) {
+        return edge->getSrc().node;
     }
     throw std::invalid_argument("Node " + n->name + " is neither source nor target of edge ");
 }
@@ -120,23 +120,24 @@ double SimpleThresholdStrategy::getBound(std::shared_ptr<Node> &blockNode, bool 
             auto rootPort = (bal->hdir == HDirection::RIGHT) ? right : left;
             auto otherPort = (bal->hdir == HDirection::RIGHT) ? left : right;
 
-            auto otherRoot = bal->root[otherPort->getNode()->getId()];
-            threshold = bal->y[otherRoot->getId()] + bal->innerShift[otherPort->getNode()->getId()] +
-                        otherPort->getPos().y + otherPort->getAnchor().y -
-                        bal->innerShift[rootPort->getNode()->getId()] - rootPort->getPos().y - rootPort->getAnchor().y;
+            auto otherRoot = bal->root[otherPort.node->getId()];
+            threshold = bal->y[otherRoot->getId()] + bal->innerShift[otherPort.node->getId()] +
+                        otherPort.port->getPos().y + otherPort.port->getAnchor().y -
+                        bal->innerShift[rootPort.node->getId()] - rootPort.port->getPos().y -
+                        rootPort.port->getAnchor().y;
         } else {
             auto rootPort = (bal->hdir == HDirection::LEFT) ? right : left;
             auto otherPort = (bal->hdir == HDirection::LEFT) ? left : right;
 
-            threshold = bal->y[bal->root[otherPort->getNode()->getId()]->getId()] +
-                        bal->innerShift[otherPort->getNode()->getId()] + otherPort->getPos().y +
-                        otherPort->getAnchor().y - bal->innerShift[rootPort->getNode()->getId()] -
-                        rootPort->getPos().y - rootPort->getAnchor().y;
+            threshold = bal->y[bal->root[otherPort.node->getId()]->getId()] + bal->innerShift[otherPort.node->getId()] +
+                        otherPort.port->getPos().y + otherPort.port->getAnchor().y -
+                        bal->innerShift[rootPort.node->getId()] - rootPort.port->getPos().y -
+                        rootPort.port->getAnchor().y;
         }
 
         // 为了使另一条边变直，我们不允许再移动这个块
-        bal->su[bal->root[left->getNode()->getId()]->getId()] = true;
-        bal->su[bal->root[right->getNode()->getId()]->getId()] = true;
+        bal->su[bal->root[left.node->getId()]->getId()] = true;
+        bal->su[bal->root[right.node->getId()]->getId()] = true;
 
         return threshold;
     }
@@ -178,23 +179,12 @@ void SimpleThresholdStrategy::postProcess() {
 }
 bool SimpleThresholdStrategy::process(std::shared_ptr<Postprocessable> &pp) {
     auto edge = pp->edge;
-    std::shared_ptr<Port> fix;
-    if (edge->getSrc()->getNode() == pp->free) {
-        fix = edge->getDst();
-    } else {
-        fix = edge->getSrc();
-    }
-    std::shared_ptr<Port> block;
-    if (edge->getSrc()->getNode() == pp->free) {
-        block = edge->getSrc();
-    } else {
-        block = edge->getDst();
-    }
-
+    EdgeTarget fix = edge->getSrc().node == pp->free ? edge->getDst() : edge->getSrc();
+    EdgeTarget block = edge->getSrc().node == pp->free ? edge->getSrc() : edge->getDst();
     // t必须是不同块的根节点
     double delta = bal->calculateDelta(fix, block);
 
-    auto nodePtr = block->getNode();
+    auto nodePtr = block.node;
     if (delta > 0 && delta < THRESHOLD) {
         // 目标y大于源y --> 向上移动？
         double availableSpace = bal->checkSpaceAbove(nodePtr, delta, ni);

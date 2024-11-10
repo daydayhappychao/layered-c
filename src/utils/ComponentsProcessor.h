@@ -1,6 +1,7 @@
 #ifndef COMPONENTS_PROCESSOR_HPP
 #define COMPONENTS_PROCESSOR_HPP
 #include <memory>
+#include <optional>
 #include <set>
 #include <vector>
 #include "../opts/PortType.h"

@@ -11,9 +11,9 @@ void LongEdgeSplitter::process(const std::shared_ptr<Graph> &graph) {
         const auto &nextLayer = layers[i + 1];
         for (const auto &node : layer->getNodes()) {
             for (const auto &port : node->getOutputPorts()) {
-                for (const auto &edge : port->getEdges()) {
+                for (const auto &edge : node->getEdgesByPort(port)) {
                     const auto &targetPort = edge->getDst();
-                    const auto &targetLayer = targetPort->getNode()->getLayer();
+                    const auto &targetLayer = targetPort.node->getLayer();
                     if (targetLayer != layer && targetLayer != nextLayer) {
                         splitEdge(edge, createDummyNode(graph, nextLayer, edge));
                     }
