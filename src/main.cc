@@ -1,117 +1,124 @@
+#include <fstream>  // 包含文件流的头文件
 #include <iostream>
-#include <ostream>
-#include "Edge.h"
-#include "Graph.h"
-#include "LayeredEnginee.h"
-#include "Node.h"
-#include "Port.h"
-#include "opts/NodeSide.h"
-namespace GuiBridge {
+#include <nlohmann/json.hpp>
+#include <random>
+#include "./Crossover.hpp"
+#include "./GeneticOptimizer.hpp"
+#include "./Graph/NodeGraph.hpp"
+#include "./Mutation.hpp"
+#include "./ParentSelection.hpp"
+#include "./Replacement.hpp"
+#include "./StopCondition.hpp"
+#include "ParentSelection.hpp"
+#include "helper/PortGraogFitness.hpp"
+#include "helper/PortGraphPopulationGenerator.hpp"
+#include "nlohmann/json_fwd.hpp"
+
+using namespace usagi;
+
+auto getBezierControlPoints(const Vector2f &p0, const Vector2f &p1, const float control_factor_a,
+                            const float control_factor_b) {
+    const Vector2f size = (p1 - p0).cwiseAbs();
+    // const auto control_x = std::min(size.x(), 250.f);
+    const auto control_x = size.x();
+
+    return std::make_tuple(Vector2f(p0.x(), p0.y()), Vector2f(p0.x() + control_x * control_factor_a, p0.y()),
+                           Vector2f(p1.x() - control_x * control_factor_b, p1.y()), Vector2f(p1.x(), p1.y()));
+};
 int main() {
-    auto graph = std::make_shared<Graph>();
+    using Gene = float;
+    using Genotype = std::vector<float>;
+    using OptimizerT =
+        genetic::GeneticOptimizer<Gene, PortGraphFitness, genetic::parent::TournamentParentSelection<5, 2>,
+                                  genetic::crossover::WholeArithmeticRecombination,
+                                  genetic::mutation::UniformRealMutation<Genotype>,
+                                  genetic::replacement::RoundRobinTournamentReplacement<10, 2>,
+                                  genetic::stop::SolutionConvergedStopCondition<float>, PortGraphPopulationGenerator,
+                                  Genotype, PortGraphIndividual>;
+    OptimizerT mOptimizer;
 
-    // 创建节点
+    mOptimizer.mutation.mutation_rate = 0.1;
+    std::filesystem::path mGraphPath = "src/Data/default.ng";
+    auto &graph = mOptimizer.generator.prototype = node_graph::NodeGraph::readFromFile(mGraphPath);
 
-    auto port1 = std::make_shared<Node>("port1", NodeSide::FIRST_SEPARATE);
-    auto port2 = std::make_shared<Node>("port2", NodeSide::FIRST_SEPARATE);
-    auto node1 = std::make_shared<Node>("node1");
-    auto node2 = std::make_shared<Node>("node2");
-    auto node3 = std::make_shared<Node>("node3");
-    auto node4 = std::make_shared<Node>("node4");
-    auto node5 = std::make_shared<Node>("node5");
-    auto port3 = std::make_shared<Node>("port3", NodeSide::LAST_SEPARATE);
+    const auto domain = std::uniform_real_distribution<float>{0.f, (graph.size.x())};
 
-    // 添加节点到图
+    mOptimizer.generator.domain = domain;
 
-    graph->addNode(port1);
-    graph->addNode(port2);
-    graph->addNode(port3);
-    graph->addNode(node1);
-    graph->addNode(node2);
-    graph->addNode(node3);
-    graph->addNode(node4);
-    graph->addNode(node5);
+    mOptimizer.mutation.domain = domain;
 
-    // 创建端口
-    auto port1_1 = std::make_shared<Port>("a1");
-    auto port1_2 = std::make_shared<Port>("a2");
-    auto port1_3 = std::make_shared<Port>("a3");
-    auto port2_1 = std::make_shared<Port>("b1");
-    auto port2_2 = std::make_shared<Port>("b2");
-    auto port2_3 = std::make_shared<Port>("b3");
-    auto port3_1 = std::make_shared<Port>("c1");
-    auto port3_2 = std::make_shared<Port>("c2");
-    auto port4_1 = std::make_shared<Port>("d1");
-    auto port4_2 = std::make_shared<Port>("d2");
-    auto port4_3 = std::make_shared<Port>("d3");
-    auto port5_1 = std::make_shared<Port>("e1");
-    auto port5_2 = std::make_shared<Port>("e2");
-    auto port5_3 = std::make_shared<Port>("e3");
-    auto port5_4 = std::make_shared<Port>("e4");
-    auto port5_5 = std::make_shared<Port>("e5");
+    mOptimizer.initializePopulation(7);
 
-    auto fix_port_1_1 = std::make_shared<Port>("g1");
-    auto fix_port_2_1 = std::make_shared<Port>("h1");
-    auto fix_port_3_1 = std::make_shared<Port>("i1");
+    nlohmann::json res;
 
-    // 添加端口到节点
-    node1->addInputPort(port1_1);
-    node1->addInputPort(port1_2);
-    node1->addOutputPort(port1_3);
+    auto &best = mOptimizer.best.top();
+    auto &g = best->graph;
+    auto &b = *g.base_graph;
+    for (int i = 0; i < graph.nodes.size(); i++) {
+        auto node = b.node(i);
+        auto pos = g.mapNodeRegion(i);
+        nlohmann::json nodeJson;
+        nodeJson["name"] = node.name;
+        nodeJson["displayName"] = node.prototype->name;
+        nodeJson["x"] = pos.min().x();
+        nodeJson["y"] = pos.min().y();
+        nodeJson["width"] = pos.sizes().x();
+        nodeJson["height"] = pos.sizes().y();
+        for (auto &port : node.prototype->in_ports) {
+            nlohmann::json portJson;
+            auto item = node.prototype->portPosition(port, g.mapNodePosition(i));
+            portJson["x"] = item.x();
+            portJson["y"] = item.y();
+            nodeJson["inPort"].emplace_back(portJson);
+        }
+        for (auto &port : node.prototype->out_ports) {
+            nlohmann::json portJson;
+            auto item = node.prototype->portPosition(port, g.mapNodePosition(i));
+            portJson["x"] = item.x();
+            portJson["y"] = item.y();
+            nodeJson["outPort"].emplace_back(portJson);
+        }
+        res["node"].push_back(nodeJson);
 
-    node2->addInputPort(port2_1);
-    node2->addOutputPort(port2_2);
-    node2->addOutputPort(port2_3);
+        // for (auto &port : node.prototype->out_ports) {
+        //     printf("%s,%f,%f\n", node.name.c_str(), node.prototype->size.x(), node.prototype->size.y());
+        // }
+    }
 
-    node3->addInputPort(port3_1);
-    node3->addOutputPort(port3_2);
+    for (std::size_t i = 0; i < b.links.size(); ++i) {
+        auto &curve = best->bezier_curves[i];
+        auto &points = curve.points;
+        auto [p0, p1] = g.mapLinkEndPoints(i);
+        auto [a, b, c, d] = getBezierControlPoints(p0, p1, curve.factor_a, curve.factor_b);
 
-    node4->addInputPort(port4_1);
-    node4->addInputPort(port4_2);
-    node4->addOutputPort(port4_3);
+        nlohmann::json lineItem;
 
-    node5->addInputPort(port5_1);
-    node5->addInputPort(port5_2);
-    node5->addInputPort(port5_3);
-    node5->addOutputPort(port5_4);
-    node5->addOutputPort(port5_5);
+        for (std::size_t j = 0; j < curve.points.size() - 1; ++j) {
+            nlohmann::json lineItemItem;
+            lineItemItem["fromX"] = points[j].x();
+            lineItemItem["fromY"] = points[j].y();
+            lineItemItem["toX"] = points[j + 1].x();
+            lineItemItem["toY"] = points[j + 1].y();
+            lineItem.emplace_back(lineItemItem);
+        }
+        res["lines"].emplace_back(lineItem);
+    }
 
-    port1->addOutputPort(fix_port_1_1);
-    port2->addOutputPort(fix_port_2_1);
-    port3->addInputPort(fix_port_3_1);
+    std::cout << res.dump(2) << std::endl;
+    std::ofstream outfile("output.json");
 
-    // 创建边
-    auto edge1 = std::make_shared<Edge>(fix_port_1_1, port1_1);
-    auto edge2 = std::make_shared<Edge>(fix_port_2_1, port1_2);
-    auto edge3 = std::make_shared<Edge>(fix_port_2_1, port2_1);
-    auto edge4 = std::make_shared<Edge>(port1_3, port3_1);
-    auto edge5 = std::make_shared<Edge>(port2_2, port4_1);
-    auto edge6 = std::make_shared<Edge>(port2_3, port5_3);
-    auto edge7 = std::make_shared<Edge>(port3_2, port5_1);
-    auto edge8 = std::make_shared<Edge>(port4_3, port5_2);
-    auto edge9 = std::make_shared<Edge>(port5_4, fix_port_3_1);
-    auto edge10 = std::make_shared<Edge>(port5_5, port4_2);
+    // 检查文件是否成功打开
+    if (!outfile.is_open()) {
+        std::cerr << "无法打开文件！" << std::endl;
+        return 1;
+    }
 
-    // 添加边到图
-    graph->addEdge(edge1);
-    graph->addEdge(edge2);
-    graph->addEdge(edge3);
-    graph->addEdge(edge4);
-    graph->addEdge(edge5);
-    graph->addEdge(edge6);
-    graph->addEdge(edge7);
-    graph->addEdge(edge8);
-    graph->addEdge(edge9);
-    graph->addEdge(edge10);
+    // 将字符串写入文件
+    outfile << res.dump(2);
 
-    // 运行 ELK Layered 算法
-    ELKLayered elkLayered(graph);
-    elkLayered.layered();
-    // elkLayered.printLayers();
-    // elkLayered.printJson();
-    std::cout << "1112" << std::endl;
+    // 关闭文件
+    outfile.close();
+
+    std::cout << "写入文件成功！" << std::endl;
     return 0;
 }
-}  // namespace GuiBridge
-
-int main() { return GuiBridge::main(); }

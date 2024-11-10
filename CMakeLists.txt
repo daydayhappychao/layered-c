@@ -8,14 +8,20 @@ project(LayoutAlgorithmC VERSION 1.0)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
 
-
+set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -mconsole")
 # 包含 Homebrew 安装路径
-include_directories(/opt/homebrew/include)  
-link_directories(/opt/homebrew/lib)       
+include_directories(D:/workspace/layered-c/include)  
 
 # 查找所有源文件
-file(GLOB_RECURSE SOURCES "src/*.cc")
+file(GLOB_RECURSE SOURCES "src/*.cc" "src/*.cpp" "src/*.hpp")
 
 
 # 生成可执行文件
 add_executable(MyExecutable ${SOURCES})
+target_include_directories(MyExecutable PRIVATE D:/workspace/layered-c/include)
+
+# # 设置构建目录为build
+set(CMAKE_BINARY_DIR ${CMAKE_CURRENT_SOURCE_DIR}/build)
+set(EXECUTABLE_OUTPUT_PATH ${CMAKE_BINARY_DIR})
+# 使用Ninja作为生成器
+set(CMAKE_GENERATOR "Ninja")
