@@ -37,17 +37,17 @@ void combine(std::vector<std::shared_ptr<Graph>> &components, std::shared_ptr<Gr
 }
 
 void moveGraph(std::shared_ptr<Graph> &destGraph, std::shared_ptr<Graph> &sourceGraph, double offsetX, double offsetY) {
-    KVector graphOffset = sourceGraph->getOffset().add(offsetX, offsetY);
+    // KVector graphOffset = sourceGraph->getOffset().add(offsetX, offsetY);
 
-    for (const auto &node : sourceGraph->getLayerlessNodes()) {
-        node->getPos().add(graphOffset);
-        for (const auto &port : node->getOutputPorts()) {
-            for (const auto &edge : port->getEdges()) {
-                edge->getBendPoints().offset(graphOffset);
-            }
-        }
-        destGraph->addNode(node);
-    }
+    // for (const auto &node : sourceGraph->getLayerlessNodes()) {
+    //     node->getPos().add(graphOffset);
+    //     for (const auto &port : node->getOutputPorts()) {
+    //         for (const auto &edge : node->getEdgesByPort(port)) {
+    //             edge->getBendPoints().offset(graphOffset);
+    //         }
+    //     }
+    //     destGraph->addNode(node);
+    // }
 }
 
 void moveGraphs(std::shared_ptr<Graph> &destGraph, std::vector<std::shared_ptr<Graph>> &sourceGraphs, double offsetX,
@@ -72,16 +72,16 @@ void placeComponents(std::vector<std::shared_ptr<Graph>> &components, const std:
     double ypos = 0;
     double highestBox = 0;
     double broadestRow = componentSpacing;
-    for (auto graph : components) {
+    for (auto &graph : components) {
         auto size = graph->getSize();
         if (xpos + size.x > maxRowWidth) {
             xpos = 0;
             ypos += highestBox + componentSpacing;
             highestBox = 0;
         }
-        auto offset = graph->getOffset();
-        offsetGraph(graph, xpos + offset.x, ypos + offset.y);
-        offset.reset();
+        // auto offset = graph->getOffset();
+        // offsetGraph(graph, xpos + offset.x, ypos + offset.y);
+        // offset.reset();
         broadestRow = std::max(broadestRow, xpos + size.x);
         highestBox = std::max(highestBox, size.y);
         xpos += size.x + componentSpacing;

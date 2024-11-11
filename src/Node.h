@@ -11,6 +11,7 @@
 
 #include "NodeProto.h"
 #include "Shape.h"
+#include "math/KVector.h"
 #include "math/Margin.h"
 #include "nlohmann/json_fwd.hpp"
 #include "opts/NodeSide.h"
@@ -31,8 +32,11 @@ public:
     Node(std::string name, std::shared_ptr<NodeProto> &proto, int _id, NodeSide side);
     int getId() const;
     void setId(int id);
-    // void addInputPort(const std::shared_ptr<Port> &port);
-    // void addOutputPort(const std::shared_ptr<Port> &port);
+
+    // proto 相关
+
+    std::shared_ptr<NodeProto> getProto();
+    KVector &getSize();
 
     // ports 相关
 
@@ -42,6 +46,7 @@ public:
     std::vector<std::shared_ptr<Port>> &getPortsByPortType(PortType type);
     // 寻找与该 port 连接的 port
     std::vector<EdgeTarget> getConnectedPorts(std::shared_ptr<Port> &port);
+    KVector getPortPos(std::shared_ptr<Port> &port);
 
     // edge相关
 
@@ -54,8 +59,6 @@ public:
     void removeEdge(std::shared_ptr<Port> &port, std::shared_ptr<Edge> &edge);
 
     std::shared_ptr<Layer> &getLayer();
-    std::shared_ptr<Graph> &getGraph();
-    void setGraph(std::shared_ptr<Graph> &nextGraph);
     NodeSide getSide();
     void setSide(NodeSide nextSide);
     HiddenNodeConnections::Connection getHiddenNodeConnections();
@@ -88,14 +91,11 @@ public:
 private:
     int id;
     std::shared_ptr<NodeProto> proto;
-    std::shared_ptr<Graph> graph;
     std::shared_ptr<Layer> layer = nullptr;
     std::map<std::shared_ptr<Port>, std::vector<std::shared_ptr<Edge>>> edges;
 
     NodeSide side;
     HiddenNodeConnections::Connection hiddenNodeConnections = HiddenNodeConnections::Connection::NONE;
-
-    
 };
 }  // namespace GuiBridge
 #endif  // NODE_HPP

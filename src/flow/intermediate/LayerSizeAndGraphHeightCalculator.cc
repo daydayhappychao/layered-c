@@ -42,6 +42,6 @@ void LayerSizeAndGraphHeightCalculator::process(std::shared_ptr<Graph> &graph) {
     }
 
     graph->getSize().setY(maxY - minY);
-    graph->getOffset().setY(graph->getOffset().y - minY);
+    // graph->getOffset().setY(graph->getOffset().y - minY);
 }
 }  // namespace GuiBridge

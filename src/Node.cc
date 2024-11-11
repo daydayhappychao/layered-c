@@ -10,7 +10,9 @@
 #include "Edge.h"
 #include "Port.h"
 #include "Shape.h"
+#include "math/KVector.h"
 #include "nlohmann/json.hpp"
+#include "nlohmann/json_fwd.hpp"
 #include "opts/NodeSide.h"
 #include "opts/PortType.h"
 #include "utils/VectorUtil.h"
@@ -24,31 +26,8 @@ Node::Node(std::string name, std::shared_ptr<NodeProto> &proto, int _id, NodeSid
 int Node::getId() const { return id; }
 void Node::setId(int id) { this->id = id; }
 
-// void Node::addInputPort(const std::shared_ptr<Port> &port) {
-//     if (port->getNode() != nullptr) {
-//         throw std::runtime_error("port {} is already used in a node");
-//     }
-//     if (this->side == NodeSide::FIRST_SEPARATE) {
-//         throw std::runtime_error("Cannot add input port to node with side FIRST_SEPARATE");
-//     }
-//     inputPorts.push_back(port);
-//     auto ptr = shared_from_this();
-
-//     port->setNode(ptr);
-// }
-
-// void Node::addOutputPort(const std::shared_ptr<Port> &port) {
-//     if (port->getNode() != nullptr) {
-//         throw std::runtime_error("port {} is already used in a node");
-//     }
-//     if (this->side == NodeSide::LAST_SEPARATE) {
-//         throw std::runtime_error("Cannot add input port to node with side LAST_SEPARATE");
-//     }
-//     outputPorts.push_back(port);
-//     auto ptr = shared_from_this();
-
-//     port->setNode(ptr);
-// }
+std::shared_ptr<NodeProto> Node::getProto() { return this->proto; };
+KVector &Node::getSize() { return this->proto->getSize(); };
 
 std::vector<std::shared_ptr<Port>> &Node::getInputPorts() { return proto->inputPorts; }
 
@@ -123,9 +102,6 @@ void Node::removeEdge(std::shared_ptr<Port> &port, std::shared_ptr<Edge> &edge) 
 
 std::shared_ptr<Layer> &Node::getLayer() { return layer; }
 
-std::shared_ptr<Graph> &Node::getGraph() { return graph; }
-void Node::setGraph(std::shared_ptr<Graph> &nextGraph) { graph = nextGraph; };
-
 NodeSide Node::getSide() { return side; };
 void Node::setSide(NodeSide nextSide) { side = nextSide; };
 
@@ -138,11 +114,13 @@ void Node::setLayer(const std::shared_ptr<Layer> &layer) {
     auto ptr = shared_from_this();
     if (this->layer != nullptr) {
         vecRemove(this->layer->getNodes(), ptr);
+        this->layer->adjustSize();
     }
     this->layer = layer;
 
     if (this->layer != nullptr) {
         this->layer->getNodes().emplace_back(ptr);
+        this->layer->adjustSize();
     }
 }
 
@@ -151,13 +129,22 @@ void Node::setDummy(const std::shared_ptr<Edge> &dummyOrigin) {
     this->dummyOrigin = dummyOrigin;
 }
 
+KVector Node::getPortPos(std::shared_ptr<Port> &port) { return KVector(this->getPos()).add(port->getPos()); };
+
 nlohmann::json Node::json() {
     nlohmann::json res;
     res["name"] = name;
     res["x"] = getPos().x;
     res["y"] = getPos().y;
-    res["width"] = proto->getSize().x;
-    res["height"] = proto->getSize().y;
+    res["width"] = getSize().x;
+    res["height"] = getSize().y;
+    for (auto &port : this->getAllPorts()) {
+        nlohmann::json portItem;
+        portItem["name"] = port->name;
+        portItem["x"] = getPortPos(port).x;
+        portItem["y"] = getPortPos(port).y;
+        res["ports"].emplace_back(portItem);
+    }
     return res;
 }
 }  // namespace GuiBridge

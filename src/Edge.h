@@ -6,6 +6,7 @@
 #include <string>
 #include <utility>
 
+#include "math/KVector.h"
 #include "math/KVectorChain.h"
 #include "nlohmann/json_fwd.hpp"
 namespace GuiBridge {
@@ -16,9 +17,6 @@ class Port;
 
 enum OppositeType { Src, Dst, None };
 
-// using EdgeTarget = std::pair<std::shared_ptr<Node>, std::shared_ptr<Port>>;
-
-// 定义 EdgeTarget 结构体来封装 std::pair
 struct EdgeTarget {
     std::shared_ptr<Node> node;
     std::shared_ptr<Port> port;
@@ -40,16 +38,14 @@ public:
     EdgeTarget getDst();
     EdgeTarget getOther(const std::shared_ptr<Node> &someNode);
     EdgeTarget getOther(EdgeTarget &edgeTarget);
-    // void setSrc(EdgeTarget &nextSrc);
-    // void setDst(EdgeTarget &nextDst);
+    // 该方法会修改原始数据，使数据与原始数据不一致，一定要记得在事后将数据修复回来
+    void setSrc(EdgeTarget &nextSrc);
+    // 该方法会修改原始数据，使数据与原始数据不一致，一定要记得在事后将数据修复回来
+    void setDst(EdgeTarget &nextDst);
 
-    KVectorChain getBendPoints();
-
-    // std::shared_ptr<Port> setOppositePort(OppositeType oppositeType);
-    // void revertOppositePort();
-
-    // void reverse(const std::shared_ptr<Graph> &layeredGraph, bool adaptPorts);
-    // bool reversed = false;
+    KVector getSrcPoint();
+    KVector getDstPoint();
+    KVectorChain &getBendPoints();
 
     bool isInLayerEdge();
 
@@ -78,13 +74,6 @@ private:
 
     std::string name;
     KVectorChain bendPoints;
-    // OppositeType oppositeType = OppositeType::None;
-    // 一端 port 被隐藏了，就存放在这里
-    // std::weak_ptr<Port> oppositePort;
-
-    // 存放原始数据
-    // std::weak_ptr<Port> originSrc;
-    // std::weak_ptr<Port> originDst;
 };
 }  // namespace GuiBridge
 #endif  // EDGE_HPP

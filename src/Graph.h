@@ -19,16 +19,20 @@ namespace GuiBridge {
 
 class Graph : public std::enable_shared_from_this<Graph>, public Shape {
 public:
+    Graph();
+
     // NodeProto
 
     void addNodeProto(const std::shared_ptr<NodeProto> &nodeProto);
     void addNodeProto(std::string name, double width, double height, int id);
     std::vector<std::shared_ptr<NodeProto>> &getNodeProtos() { return nodeProtos; };
+    std::shared_ptr<NodeProto> getDummyNodeProto();
 
     // Port
 
     void addPort(std::string name, int id, PortType portType, int protoId);
     std::vector<std::shared_ptr<Port>> &getPorts() { return ports; };
+    std::shared_ptr<Port> getPortById(int id);
 
     // Node
 

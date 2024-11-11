@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>D3.js Node Visualization with Offset</title>
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <style>
+      .node {
+        stroke: black;
+        fill: lightblue;
+      }
+      .port {
+        fill: red;
+      }
+      .edge {
+        stroke: black;
+        stroke-width: 1;
+        fill: none;
+      }
+      text {
+        text-anchor: middle;
+        font-size: 4px;
+      }
+    </style>
+  </head>
+  <body>
+    <svg id="canvas" width="2200" height="2400"></svg>
+
+    <script>
+      fetch("/data/output.json")
+        .then((response) => {
+          if (!response.ok) {
+            throw new Error("网络响应失败");
+          }
+          return response.json(); // 将响应转换为 JSON
+        })
+        .then((data) => {
+          // 获取所有节点的最小 x 和 y 值
+          const minX = d3.min(data.nodes, (d) => d.x);
+          const minY = d3.min(data.nodes, (d) => d.y);
+
+          // 计算偏移量，使得最小值为非负数
+          const offsetX = (minX < 0 ? -minX : 0) + 100;
+          const offsetY = (minY < 0 ? -minY : 0) + 100;
+
+          // 获取 SVG 画布
+          const svg = d3.select("#canvas");
+
+          // 绘制节点
+          const nodes = svg
+            .selectAll("rect")
+            .data(data.nodes)
+            .enter()
+            .append("rect")
+            .attr("class", "node")
+            .attr("x", (d) => d.x + offsetX)
+            .attr("y", (d) => d.y + offsetY)
+            .attr("width", (d) => d.width)
+            .attr("height", (d) => d.height)
+            .attr("fill", "lightblue")
+            .attr("stroke", "black");
+
+          // 绘制节点名称
+          svg
+            .selectAll("text")
+            .data(data.nodes)
+            .enter()
+            .append("text")
+            .attr("x", (d) => d.x + offsetX + d.width / 2)
+            .attr("y", (d) => d.y + offsetY)
+            .attr("dy", "0") // 垂直居中
+            .text((d) => d.name)
+            .attr("fill", "black")
+            .attr("font-size", 4);
+
+          // 绘制端口
+          svg
+            .selectAll(".port")
+            .data(
+              data.nodes.flatMap((node) =>
+                node.ports.map((port) => ({ node, port }))
+              )
+            )
+            .enter()
+            .append("circle")
+            .attr("class", "port")
+            .attr("cx", (d) => d.port.x + offsetX)
+            .attr("cy", (d) => d.port.y + offsetY)
+            .attr("r", 1) // 设置端口为 1x1
+            .attr("fill", "red");
+
+          // 绘制端口名称
+          svg
+            .selectAll(".port-label")
+            .data(
+              data.nodes.flatMap((node) =>
+                node.ports.map((port) => ({ node, port }))
+              )
+            )
+            .enter()
+            .append("text")
+            .attr("x", (d) => d.port.x + offsetX + 5)
+            .attr("y", (d) => d.port.y + offsetY - 5)
+            .text((d) => d.port.name)
+            .attr("fill", "red")
+            .attr("font-size", "4px");
+
+          // 绘制边
+          data.edges.forEach((edge) => {
+            if (edge.bendPoints && edge.bendPoints.length > 0) {
+              // 如果有 bendPoints，绘制折线
+              const points = [
+                { x: edge.srcX, y: edge.srcY },
+                ...edge.bendPoints,
+                { x: edge.dstX, y: edge.dstY },
+              ]
+                .map((point) => `${point.x + offsetX},${point.y + offsetY}`)
+                .join(" ");
+
+              const polyline = document.createElementNS(
+                "http://www.w3.org/2000/svg",
+                "polyline"
+              );
+              polyline.setAttribute("points", points);
+              polyline.classList.add("edge");
+              canvas.appendChild(polyline);
+            } else {
+              // 否则绘制直线
+              const line = document.createElementNS(
+                "http://www.w3.org/2000/svg",
+                "line"
+              );
+              line.setAttribute("x1", edge.srcX + offsetX);
+              line.setAttribute("y1", edge.srcY + offsetY);
+              line.setAttribute("x2", edge.dstX + offsetX);
+              line.setAttribute("y2", edge.dstY + offsetY);
+              line.classList.add("edge");
+              canvas.appendChild(line);
+            }
+          });
+        })
+        .catch((error) => {
+          console.error("读取 JSON 文件失败:", error);
+        });
+    </script>
+  </body>
+</html>

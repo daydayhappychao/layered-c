@@ -8,13 +8,23 @@
 #include "Edge.h"
 #include "Layer.h"
 #include "Node.h"
+#include "NodeProto.h"
+#include "Port.h"
 #include "nlohmann/json.hpp"
 #include "utils/VectorUtil.h"
 
 namespace GuiBridge {
 
+Graph::Graph() {
+    addNodeProto("dummyTemp", 1, 1, -1);
+    addPort("dummyInport", -1, PortType::INPUT, -1);
+    addPort("dummyOutport", -2, PortType::OUTPUT, -1);
+};
+
+std::shared_ptr<NodeProto> Graph::getDummyNodeProto() { return getProtoById(-1); }
+
 std::shared_ptr<NodeProto> Graph::getProtoById(int id) {
-    auto protoPtr = vecFind(getNodeProtos(), [id](const std::shared_ptr<NodeProto> &proto) { return proto->id == id; });
+    auto protoPtr = vecFind(nodeProtos, [id](const std::shared_ptr<NodeProto> &proto) { return proto->id == id; });
     if (!protoPtr.has_value()) {
         throw std::runtime_error("对应的 NodeProto 不存在");
     }
@@ -29,16 +39,24 @@ void Graph::addNodeProto(std::string name, double width, double height, int id) 
 };
 
 void Graph::addPort(std::string name, int id, PortType portType, int protoId) {
-    auto protoPtr = getProtoById(id);
+    auto protoPtr = getProtoById(protoId);
     auto portPtr = protoPtr->addPort(std::move(name), id, portType);
     ports.emplace_back(portPtr);
 }
+
+std::shared_ptr<Port> Graph::getPortById(int id) {
+    auto portPtr = vecFind(ports, [id](const std::shared_ptr<Port> &port) { return port->_id == id; });
+    if (!portPtr.has_value()) {
+        throw std::runtime_error("对应的 Port 不存在");
+    }
+    auto portPtrValue = portPtr.value();
+    return portPtrValue;
+};
 
 void Graph::addNode(const std::shared_ptr<Node> &node) {
     nodes.push_back(node);
     layerlessNodes.emplace_back(node);
     auto ptr = shared_from_this();
-    node->setGraph(ptr);
 }
 void Graph::addNode(int id, int protoId, std::string name) {
     auto protoPtr = getProtoById(protoId);
@@ -59,10 +77,10 @@ void Graph::addEdge(std::shared_ptr<Node> &srcNode, std::shared_ptr<Port> &srcPo
     addEdge(edge);
 };
 void Graph::addEdge(int srcNodeId, int srcPortId, int dstNodeId, int dstPortId) {
-    auto srcNode = vecFind(nodes, [srcNodeId](std::shared_ptr<Node> &node) { return node->_id == srcNodeId; });
-    auto srcPort = vecFind(ports, [srcPortId](std::shared_ptr<Port> &port) { return port->_id == srcPortId; });
-    auto dstNode = vecFind(nodes, [dstNodeId](std::shared_ptr<Node> &node) { return node->_id == dstNodeId; });
-    auto dstPort = vecFind(ports, [dstPortId](std::shared_ptr<Port> &port) { return port->_id == dstPortId; });
+    auto srcNode = vecFind(nodes, [srcNodeId](const std::shared_ptr<Node> &node) { return node->_id == srcNodeId; });
+    auto srcPort = vecFind(ports, [srcPortId](const std::shared_ptr<Port> &port) { return port->_id == srcPortId; });
+    auto dstNode = vecFind(nodes, [dstNodeId](const std::shared_ptr<Node> &node) { return node->_id == dstNodeId; });
+    auto dstPort = vecFind(ports, [dstPortId](const std::shared_ptr<Port> &port) { return port->_id == dstPortId; });
     if (srcNode.has_value() && srcPort.has_value() && dstNode.has_value() && dstPort.has_value()) {
         addEdge(srcNode.value(), srcPort.value(), dstNode.value(), dstPort.value());
     } else {
@@ -95,7 +113,7 @@ std::vector<std::vector<std::shared_ptr<Node>>> Graph::toNodeArray() {
 nlohmann::json Graph::json() {
     nlohmann::json res;
     for (auto &n : nodes) {
-        res['node'].push_back(n->json());
+        res['node'].emplace_back(n->json());
     }
     return res;
 };

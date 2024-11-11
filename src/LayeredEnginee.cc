@@ -12,18 +12,18 @@
 #include <string>
 #include <utility>
 
+#include "./flow/custom/EdgeToPloyLine.h"
 #include "./flow/p1_cycle_breaking/GreedyCycleBreaker.h"
 #include "./flow/p4_nodes/BKNodePlacer.h"
 #include "./utils/ComponentsProcessor.h"
 #include "Graph.h"
 #include "NodeProto.h"
 #include "Port.h"
+#include "flow/custom/LongEdgeSplitter.h"
 #include "flow/intermediate/LayerConstraintPostprocessor.h"
 #include "flow/intermediate/LayerConstraintPreprocessor.h"
 #include "flow/intermediate/LayerSizeAndGraphHeightCalculator.h"
 #include "flow/p2_layers/networkSimplex/NetworkSimplexLayerer.h"
-#include "flow/p3_crossing_minimization/LayerSweepCrossingMinimizer.h"
-#include "flow/p3_crossing_minimization/LongEdgeSplitter.h"
 #include "opts/CrossMinType.h"
 #include "opts/PortType.h"
 #include "utils/VectorUtil.h"
@@ -64,6 +64,7 @@ ELKLayered::ELKLayered(const std::filesystem::path &path) {
             std::size_t id;
             std::size_t proto;
             std::string name;
+            in >> id >> proto >> name;
             graph->addNode(id, proto, name);
         } else if (buf == "edge") {
             int out_node;
@@ -81,10 +82,6 @@ ELKLayered::ELKLayered(const std::filesystem::path &path) {
 void ELKLayered::layered() {
     ComponentsProcessor componentsProcessor;
 
-    auto components = componentsProcessor.split(this->graph);
-
-    auto graph = components[0];
-
     // p1 cycle breaking
     greedy_cycle_breaker(graph);
 
@@ -99,10 +96,7 @@ void ELKLayered::layered() {
     // p3 crossing minimization
     LongEdgeSplitter longEdgeSplitter;
     longEdgeSplitter.process(graph);
-    // LayerSweepCrossingMinimizer layerSweepCrossingMinimizer(CrossMinType::BARYCENTER);
-    // layerSweepCrossingMinimizer.process(graph);
-    // LayerSweepCrossingMinimizer layerSweepCrossingMinimizer2(CrossMinType::TWO_SIDED_GREEDY_SWITCH);
-    // layerSweepCrossingMinimizer2.process(graph);
+
     // p4 node placement
     BKNodePlacer bkNodePlacer;
     bkNodePlacer.process(graph);
@@ -111,6 +105,8 @@ void ELKLayered::layered() {
     layerSizeAndGraphHeightCalculator.process(graph);
 
     // p5 edge routing
+    EdgeToPloyLine edgeToPloyLine;
+    edgeToPloyLine.process(graph);
 
     printJson();
 }
@@ -129,14 +125,21 @@ void ELKLayered::printJson() {
 
     for (const auto &node : nodes) {
         auto nodeJson = node->json();
-        for (const auto &port : node->getAllPorts()) {
-            nodeJson["ports"].push_back(port->json());
-        }
-        res["nodes"].push_back(nodeJson);
+        res["nodes"].emplace_back(nodeJson);
     }
 
     for (const auto &edge : edges) {
-        res["edges"].push_back(edge->json());
+        auto edgeJson = edge->json();
+        res["edges"].emplace_back(edgeJson);
+    }
+
+    std::ofstream outFile("data/output.json");
+    if (outFile.is_open()) {
+        outFile << res.dump();  // 写入内容
+        outFile.close();        // 关闭文件
+        std::cout << "写入文件成功！" << std::endl;
+    } else {
+        std::cerr << "无法打开文件" << std::endl;
     }
 
     std::cout << res.dump() << std::endl;

@@ -26,9 +26,9 @@ void greedy_cycle_breaker(const std::shared_ptr<Graph> &graph) {
     for (const auto &node : nodes) {
         node->setId(index);
         for (const auto &port : node->getInputPorts()) {
-            for (const auto &edge : port->getEdges()) {
+            for (const auto &edge : node->getEdgesByPort(port)) {
                 // self-loops edge
-                if (edge->getSrc()->getNode() == node) {
+                if (edge->getSrc().node == node) {
                     continue;
                 }
                 indeg[index] += 1;
@@ -36,9 +36,9 @@ void greedy_cycle_breaker(const std::shared_ptr<Graph> &graph) {
         }
 
         for (const auto &port : node->getOutputPorts()) {
-            for (const auto &edge : port->getEdges()) {
+            for (const auto &edge : node->getEdgesByPort(port)) {
                 // self-loops edge
-                if (edge->getDst()->getNode() == node) {
+                if (edge->getDst().node == node) {
                     continue;
                 }
                 outdeg[index] += 1;
@@ -61,9 +61,9 @@ void greedy_cycle_breaker(const std::shared_ptr<Graph> &graph) {
 
     auto updateNeighbors = [&](const std::shared_ptr<Node> &node) {
         for (const auto &port : node->getAllPorts()) {
-            for (const auto &edge : port->getEdges()) {
+            for (const auto &edge : node->getEdgesByPort(port)) {
                 auto connectedPort = edge->getOther(node);
-                auto endpoint = connectedPort->getNode();
+                auto endpoint = connectedPort.node;
 
                 // self-loops
                 if (node == endpoint) {
@@ -71,7 +71,7 @@ void greedy_cycle_breaker(const std::shared_ptr<Graph> &graph) {
                 }
                 int index = endpoint->getId();
                 if (mark[index] == 0) {
-                    if (edge->getDst() == connectedPort) {
+                    if (edge->getDst().port == connectedPort.port) {
                         indeg[index] -= 1;
                         if (indeg[index] <= 0 && outdeg[index] > 0) {
                             sources.push_back(endpoint);
@@ -148,10 +148,11 @@ void greedy_cycle_breaker(const std::shared_ptr<Graph> &graph) {
 
     for (const auto &node : nodes) {
         for (const auto &port : node->getOutputPorts()) {
-            for (const auto &edge : port->getEdges()) {
-                int targetIx = edge->getDst()->getNode()->getId();
+            for (const auto &edge : node->getEdgesByPort(port)) {
+                int targetIx = edge->getDst().node->getId();
                 if (mark[node->getId()] > mark[targetIx]) {
-                    edge->reverse(graph, true);
+                    edge->hidden();
+                    // edge->reverse(graph, true);
                 }
             }
         }

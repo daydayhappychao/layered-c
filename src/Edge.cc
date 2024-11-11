@@ -13,10 +13,14 @@
 #include "nlohmann/json_fwd.hpp"
 namespace GuiBridge {
 
-Edge::Edge(std::shared_ptr<Node> &srcNode, std::shared_ptr<Port> &src, std::shared_ptr<Node> &dstNode,
-           std::shared_ptr<Port> &dst){
+Edge::Edge(std::shared_ptr<Node> &srcNode, std::shared_ptr<Port> &srcPort, std::shared_ptr<Node> &dstNode,
+           std::shared_ptr<Port> &dstPort)
+    : srcNode(srcNode),
+      srcPort(srcPort),
+      dstNode(dstNode),
+      dstPort(dstPort){
 
-};
+      };
 
 EdgeTarget Edge::getSrc() {
     auto nodePtr = srcNode.lock();
@@ -125,7 +129,7 @@ EdgeTarget Edge::getOther(EdgeTarget &edgeTarget) { getOther(edgeTarget.node); }
 //     this->reversed = !this->reversed;
 // }
 
-KVectorChain Edge::getBendPoints() { return bendPoints; }
+KVectorChain &Edge::getBendPoints() { return bendPoints; }
 
 bool Edge::isInLayerEdge() { return srcNode.lock()->getLayer() == dstNode.lock()->getLayer(); }
 
@@ -153,11 +157,64 @@ void Edge::show() {
     getDst().node->addEdge(dstPortPtr, edge);
 }
 
+void Edge::setSrc(EdgeTarget &nextSrc) {
+    auto thisPtr = shared_from_this();
+    auto srcPortPtr = srcPort.lock();
+    srcNode.lock()->removeEdge(srcPortPtr, thisPtr);
+
+    this->srcNode = nextSrc.node;
+    this->srcPort = nextSrc.port;
+
+    auto nextSrcPortPtr = srcPort.lock();
+    srcNode.lock()->addEdge(nextSrcPortPtr, thisPtr);
+}
+
+void Edge::setDst(EdgeTarget &nextDst) {
+    auto thisPtr = shared_from_this();
+    auto dstPortPtr = dstPort.lock();
+    dstNode.lock()->removeEdge(dstPortPtr, thisPtr);
+
+    this->dstNode = nextDst.node;
+    this->dstPort = nextDst.port;
+
+    auto nextDstPortPtr = dstPort.lock();
+    dstNode.lock()->addEdge(nextDstPortPtr, thisPtr);
+}
+
+KVector Edge::getSrcPoint() {
+    auto srcPtr = srcNode.lock();
+    auto srcPortPtr = srcPort.lock();
+    auto portPos = srcPtr->getPortPos(srcPortPtr);
+    return portPos;
+};
+
+KVector Edge::getDstPoint() {
+    auto dstPtr = dstNode.lock();
+    auto dstPortPtr = dstPort.lock();
+    auto dstPortPos = dstPtr->getPortPos(dstPortPtr);
+    return dstPortPos;
+};
+
 nlohmann::json Edge::json() {
     nlohmann::json res;
-    res["src"] = srcNode.lock()->name;
+    auto srcPtr = srcNode.lock();
+    auto portPos = getSrcPoint();
+
+    auto dstPtr = dstNode.lock();
+    auto dstPortPos = getDstPoint();
+    res["src"] = srcPtr->name;
+    res["srcX"] = portPos.x;
+    res["srcY"] = portPos.y;
     res["dst"] = dstNode.lock()->name;
+    res["dstX"] = dstPortPos.x;
+    res["dstY"] = dstPortPos.y;
     res["name"] = name;
+    for (auto &point : getBendPoints()) {
+        nlohmann::json item;
+        item["x"] = point.x;
+        item["y"] = point.y;
+        res["bendPoints"].emplace_back(item);
+    }
     return res;
 }
 }  // namespace GuiBridge

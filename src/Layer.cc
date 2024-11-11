@@ -1,11 +1,10 @@
 #include "Layer.h"
 #include <algorithm>
+#include <cstddef>
 #include <utility>
 #include "Graph.h"
 namespace GuiBridge {
-Layer::Layer(std::shared_ptr<Graph> graph) : owner(std::move(graph)) {}
-
-KVector &Layer::getSize() { return size; }
+Layer::Layer(std::shared_ptr<Graph> &graph) : owner(graph) {}
 
 std::vector<std::shared_ptr<Node>> &Layer::getNodes() { return nodes; }
 
@@ -20,13 +19,50 @@ int Layer::getIndex() const {
     return -1;  // Or throw an exception if the layer is not found in the graph
 }
 
-std::vector<std::shared_ptr<Node>>::iterator Layer::begin() { return nodes.begin(); }
+void Layer::adjustSize() {
+    float maxWidth = 0.0F;
+    for (auto &node : nodes) {
+        if (node->getSize().x > maxWidth) {
+            maxWidth = node->getSize().x;
+        }
+    }
+    if (maxWidth != this->size.x) {
+        this->size.setX(maxWidth);
+        auto thisPtr = shared_from_this();
+        auto it = std::find(owner->getLayers().begin(), owner->getLayers().end(), thisPtr);
+        std::vector<std::shared_ptr<Layer>> needCalculateLayers(it, owner->getLayers().end());
+        for (auto &layer : needCalculateLayers) {
+            layer->adjustLayerAndNodePosX();
+        }
+    } else {
+        this->adjustLayerAndNodePosX();
+    }
+}
 
-std::vector<std::shared_ptr<Node>>::iterator Layer::end() { return nodes.end(); }
+void Layer::adjustLayerAndNodePosX() {
+    auto thisPtr = shared_from_this();
 
-std::vector<std::shared_ptr<Node>>::const_iterator Layer::begin() const { return nodes.begin(); }
+    float layerX = 0.0F;
 
-std::vector<std::shared_ptr<Node>>::const_iterator Layer::end() const { return nodes.end(); }
+    for (std::size_t i = 0; i < owner->getLayers().size(); i++) {
+        auto &layer = owner->getLayers()[i];
+        auto &lastLayer = owner->getLayers()[i - 1];
+        if (i != 0) {
+            layerX += layer->getMargin() + lastLayer->getMargin() + lastLayer->getSize().x;
+        }
+        if (thisPtr == layer) {
+            break;
+        }
+    }
 
-std::string Layer::toString() const { return "L_" + std::to_string(getIndex()) + " " + std::to_string(nodes.size()); }
+    this->getPos().setX(layerX);
+
+    for (auto &node : nodes) {
+        float nodeX = layerX + (this->size.x - node->getSize().x) / 2;
+        node->getPos().setX(nodeX);
+    }
+}
+
+float Layer::getMargin() { return this->size.x / 2; }
+
 }  // namespace GuiBridge

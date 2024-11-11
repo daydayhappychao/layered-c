@@ -1,10 +1,10 @@
 #       id      displayname         width   height  
-proto   0       "IN_PORT"          1 1 
-proto   1       "OUT_PORT"       1 1 
-proto   2       "BLOCK1"      100 50 
-proto   3       "BLOCK2"        100 50
-proto   4       "BLOCK3"        100 50
-proto   5       "BLOCK4"        100 50
+proto   0       "IN_PORT"          10 10
+proto   1       "OUT_PORT"       10 10 
+proto   2       "BLOCK1"      200 40 
+proto   3       "BLOCK2"        110 50
+proto   4       "BLOCK3"        100 60
+proto   5       "BLOCK4"        80 70
 
 #       id      proto   name    type
 port    0       0       "IN_PORT_PORT"  "out"
@@ -21,9 +21,6 @@ port    10       5       "BLOCK4_PORT1"  "in"
 port    11       5       "BLOCK4_PORT2"  "in"
 port    12       5       "BLOCK4_PORT3"  "in"
 port    13       5       "BLOCK4_PORT4"  "out"
-
-
-
 
 #       id      proto   name
 node    0       0       "IN_PORT_1"
