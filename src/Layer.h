@@ -5,7 +5,6 @@
 #include <memory>
 #include <string>
 #include <vector>
-#include "./math/KVector.h"
 #include "Shape.h"
 namespace GuiBridge {
 class Graph;

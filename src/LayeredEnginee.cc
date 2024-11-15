@@ -19,14 +19,14 @@
 #include "Graph.h"
 #include "NodeProto.h"
 #include "Port.h"
+#include "flow/custom/LayerSweepCrossingMinimizer.h"
 #include "flow/custom/LongEdgeSplitter.h"
 #include "flow/intermediate/LayerConstraintPostprocessor.h"
 #include "flow/intermediate/LayerConstraintPreprocessor.h"
 #include "flow/intermediate/LayerSizeAndGraphHeightCalculator.h"
 #include "flow/p2_layers/networkSimplex/NetworkSimplexLayerer.h"
-#include "opts/CrossMinType.h"
+#include "opts/NodeSide.h"
 #include "opts/PortType.h"
-#include "utils/VectorUtil.h"
 
 namespace GuiBridge {
 
@@ -64,14 +64,21 @@ ELKLayered::ELKLayered(const std::filesystem::path &path) {
             std::size_t id;
             std::size_t proto;
             std::string name;
-            in >> id >> proto >> name;
-            graph->addNode(id, proto, name);
+            std::string pos;
+            in >> id >> proto >> name >> pos;
+            if (pos == "default") {
+                graph->addNode(id, proto, name);
+            } else {
+                NodeSide side = pos == "west" ? NodeSide::FIRST_SEPARATE : NodeSide::LAST_SEPARATE;
+                graph->addNode(id, proto, name, side);
+            }
         } else if (buf == "edge") {
             int out_node;
             int out_pin;
             int in_node;
             int in_pin;
-            in >> out_node >> out_pin >> in_node >> in_pin;
+            std::string name;
+            in >> out_node >> out_pin >> in_node >> in_pin >> name;
             graph->addEdge(out_node, out_pin, in_node, in_pin);
         } else {
             assert(false);
@@ -97,6 +104,9 @@ void ELKLayered::layered() {
     LongEdgeSplitter longEdgeSplitter;
     longEdgeSplitter.process(graph);
 
+    LayerSweepCrossingMinimizer layerSweepCrossingMinimizer;
+    layerSweepCrossingMinimizer.process(graph);
+
     // p4 node placement
     BKNodePlacer bkNodePlacer;
     bkNodePlacer.process(graph);
@@ -105,6 +115,9 @@ void ELKLayered::layered() {
     layerSizeAndGraphHeightCalculator.process(graph);
 
     // p5 edge routing
+    for (auto &edge : graph->getEdges()) {
+        edge->show();
+    }
     EdgeToPloyLine edgeToPloyLine;
     edgeToPloyLine.process(graph);
 

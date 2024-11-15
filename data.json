@@ -1,0 +1,832 @@
+{
+  "cells": [
+      {
+          "func": null,
+          "handle_name": "/WORK/GcdUnitDpathRTL_0x4d0fc71ead8d3d9e/b_zero",
+          "leaf": false,
+          "name": "b_zero",
+          "pins": [
+              {
+                  "bits": [
+                      97
+                  ],
+                  "direction": "output",
+                  "name": "out"
+              },
+              {
+                  "bits": [
+                      32,
+                      49,
+                      51,
+                      56,
+                      66,
+                      78,
+                      87,
+                      88,
+                      89,
+                      90,
+                      91,
+                      92,
+                      94,
+                      108,
+                      109,
+                      116
+                  ],
+                  "direction": "input",
+                  "name": "in_"
+              }
+          ],
+          "type": ""
+      },
+      {
+          "func": null,
+          "handle_name": "/WORK/GcdUnitDpathRTL_0x4d0fc71ead8d3d9e/a_reg",
+          "leaf": false,
+          "name": "a_reg",
+          "pins": [
+              {
+                  "bits": [
+                      69
+                  ],
+                  "direction": "input",
+                  "name": "clk"
+              },
+              {
+                  "bits": [
+                      23,
+                      26,
+                      27,
+                      28,
+                      29,
+                      30,
+                      34,
+                      35,
+                      38,
+                      54,
+                      59,
+                      63,
+                      74,
+                      75,
+                      80,
+                      104
+                  ],
+                  "direction": "output",
+                  "name": "out"
+              },
+              {
+                  "bits": [
+                      58
+                  ],
+                  "direction": "input",
+                  "name": "en"
+              },
+              {
+                  "bits": [
+                      15,
+                      22,
+                      37,
+                      44,
+                      45,
+                      47,
+                      48,
+                      50,
+                      52,
+                      53,
+                      55,
+                      64,
+                      71,
+                      73,
+                      82,
+                      112
+                  ],
+                  "direction": "input",
+                  "name": "in_"
+              }
+          ],
+          "type": ""
+      },
+      {
+          "func": null,
+          "handle_name": "/WORK/GcdUnitDpathRTL_0x4d0fc71ead8d3d9e/a_lt_b",
+          "leaf": false,
+          "name": "a_lt_b",
+          "pins": [
+              {
+                  "bits": [
+                      96
+                  ],
+                  "direction": "output",
+                  "name": "out"
+              },
+              {
+                  "bits": [
+                      32,
+                      49,
+                      51,
+                      56,
+                      66,
+                      78,
+                      87,
+                      88,
+                      89,
+                      90,
+                      91,
+                      92,
+                      94,
+                      108,
+                      109,
+                      116
+                  ],
+                  "direction": "input",
+                  "name": "in1"
+              },
+              {
+                  "bits": [
+                      23,
+                      26,
+                      27,
+                      28,
+                      29,
+                      30,
+                      34,
+                      35,
+                      38,
+                      54,
+                      59,
+                      63,
+                      74,
+                      75,
+                      80,
+                      104
+                  ],
+                  "direction": "input",
+                  "name": "in0"
+              }
+          ],
+          "type": ""
+      },
+      {
+          "func": null,
+          "handle_name": "/WORK/GcdUnitDpathRTL_0x4d0fc71ead8d3d9e/sub",
+          "leaf": false,
+          "name": "sub",
+          "pins": [
+              {
+                  "bits": [
+                      32,
+                      49,
+                      51,
+                      56,
+                      66,
+                      78,
+                      87,
+                      88,
+                      89,
+                      90,
+                      91,
+                      92,
+                      94,
+                      108,
+                      109,
+                      116
+                  ],
+                  "direction": "input",
+                  "name": "in1"
+              },
+              {
+                  "bits": [
+                      23,
+                      26,
+                      27,
+                      28,
+                      29,
+                      30,
+                      34,
+                      35,
+                      38,
+                      54,
+                      59,
+                      63,
+                      74,
+                      75,
+                      80,
+                      104
+                  ],
+                  "direction": "input",
+                  "name": "in0"
+              },
+              {
+                  "bits": [
+                      0,
+                      1,
+                      2,
+                      3,
+                      4,
+                      5,
+                      6,
+                      7,
+                      36,
+                      40,
+                      43,
+                      67,
+                      72,
+                      77,
+                      102,
+                      114
+                  ],
+                  "direction": "output",
+                  "name": "out"
+              }
+          ],
+          "type": ""
+      },
+      {
+          "func": null,
+          "handle_name": "/WORK/GcdUnitDpathRTL_0x4d0fc71ead8d3d9e/b_mux",
+          "leaf": false,
+          "name": "b_mux",
+          "pins": [
+              {
+                  "bits": [
+                      23,
+                      26,
+                      27,
+                      28,
+                      29,
+                      30,
+                      34,
+                      35,
+                      38,
+                      54,
+                      59,
+                      63,
+                      74,
+                      75,
+                      80,
+                      104
+                  ],
+                  "direction": "input",
+                  "name": "in_$000"
+              },
+              {
+                  "bits": [
+                      13,
+                      14,
+                      16,
+                      17,
+                      19,
+                      21,
+                      24,
+                      25,
+                      31,
+                      33,
+                      68,
+                      76,
+                      81,
+                      83,
+                      84,
+                      85
+                  ],
+                  "direction": "output",
+                  "name": "out"
+              },
+              {
+                  "bits": [
+                      86
+                  ],
+                  "direction": "input",
+                  "name": "sel"
+              },
+              {
+                  "bits": [
+                      8,
+                      9,
+                      10,
+                      11,
+                      12,
+                      18,
+                      20,
+                      46,
+                      61,
+                      62,
+                      93,
+                      100,
+                      107,
+                      117,
+                      118,
+                      119
+                  ],
+                  "direction": "input",
+                  "name": "in_$001"
+              }
+          ],
+          "type": ""
+      },
+      {
+          "func": null,
+          "handle_name": "/WORK/GcdUnitDpathRTL_0x4d0fc71ead8d3d9e/b_reg",
+          "leaf": false,
+          "name": "b_reg",
+          "pins": [
+              {
+                  "bits": [
+                      69
+                  ],
+                  "direction": "input",
+                  "name": "clk"
+              },
+              {
+                  "bits": [
+                      32,
+                      49,
+                      51,
+                      56,
+                      66,
+                      78,
+                      87,
+                      88,
+                      89,
+                      90,
+                      91,
+                      92,
+                      94,
+                      108,
+                      109,
+                      116
+                  ],
+                  "direction": "output",
+                  "name": "out"
+              },
+              {
+                  "bits": [
+                      95
+                  ],
+                  "direction": "input",
+                  "name": "en"
+              },
+              {
+                  "bits": [
+                      13,
+                      14,
+                      16,
+                      17,
+                      19,
+                      21,
+                      24,
+                      25,
+                      31,
+                      33,
+                      68,
+                      76,
+                      81,
+                      83,
+                      84,
+                      85
+                  ],
+                  "direction": "input",
+                  "name": "in_"
+              }
+          ],
+          "type": ""
+      },
+      {
+          "func": null,
+          "handle_name": "/WORK/GcdUnitDpathRTL_0x4d0fc71ead8d3d9e/a_mux",
+          "leaf": false,
+          "name": "a_mux",
+          "pins": [
+              {
+                  "bits": [
+                      60,
+                      70
+                  ],
+                  "direction": "input",
+                  "name": "sel"
+              },
+              {
+                  "bits": [
+                      0,
+                      1,
+                      2,
+                      3,
+                      4,
+                      5,
+                      6,
+                      7,
+                      36,
+                      40,
+                      43,
+                      67,
+                      72,
+                      77,
+                      102,
+                      114
+                  ],
+                  "direction": "input",
+                  "name": "in_$001"
+              },
+              {
+                  "bits": [
+                      32,
+                      49,
+                      51,
+                      56,
+                      66,
+                      78,
+                      87,
+                      88,
+                      89,
+                      90,
+                      91,
+                      92,
+                      94,
+                      108,
+                      109,
+                      116
+                  ],
+                  "direction": "input",
+                  "name": "in_$002"
+              },
+              {
+                  "bits": [
+                      15,
+                      22,
+                      37,
+                      44,
+                      45,
+                      47,
+                      48,
+                      50,
+                      52,
+                      53,
+                      55,
+                      64,
+                      71,
+                      73,
+                      82,
+                      112
+                  ],
+                  "direction": "output",
+                  "name": "out"
+              },
+              {
+                  "bits": [
+                      39,
+                      41,
+                      42,
+                      57,
+                      65,
+                      79,
+                      98,
+                      99,
+                      101,
+                      103,
+                      105,
+                      106,
+                      110,
+                      111,
+                      113,
+                      115
+                  ],
+                  "direction": "input",
+                  "name": "in_$000"
+              }
+          ],
+          "type": ""
+      }
+  ],
+  "nets": [
+      {
+          "bits": [
+              97
+          ],
+          "handle_name": "/WORK/GcdUnitDpathRTL_0x4d0fc71ead8d3d9e/is_b_zero",
+          "name": "is_b_zero"
+      },
+      {
+          "bits": [
+              95
+          ],
+          "handle_name": "/WORK/GcdUnitDpathRTL_0x4d0fc71ead8d3d9e/b_reg_en",
+          "name": "b_reg_en"
+      },
+      {
+          "bits": [
+              86
+          ],
+          "handle_name": "/WORK/GcdUnitDpathRTL_0x4d0fc71ead8d3d9e/b_mux_sel",
+          "name": "b_mux_sel"
+      },
+      {
+          "bits": [
+              13,
+              14,
+              16,
+              17,
+              19,
+              21,
+              24,
+              25,
+              31,
+              33,
+              68,
+              76,
+              81,
+              83,
+              84,
+              85
+          ],
+          "handle_name": "/WORK/GcdUnitDpathRTL_0x4d0fc71ead8d3d9e/b_mux$out",
+          "name": "b_mux$out"
+      },
+      {
+          "bits": [
+              0,
+              1,
+              2,
+              3,
+              4,
+              5,
+              6,
+              7,
+              36,
+              40,
+              43,
+              67,
+              72,
+              77,
+              102,
+              114
+          ],
+          "handle_name": "/WORK/GcdUnitDpathRTL_0x4d0fc71ead8d3d9e/resp_msg",
+          "name": "resp_msg"
+      },
+      {
+          "bits": [
+              60,
+              70
+          ],
+          "handle_name": "/WORK/GcdUnitDpathRTL_0x4d0fc71ead8d3d9e/a_mux_sel",
+          "name": "a_mux_sel"
+      },
+      {
+          "bits": [
+              15,
+              22,
+              37,
+              44,
+              45,
+              47,
+              48,
+              50,
+              52,
+              53,
+              55,
+              64,
+              71,
+              73,
+              82,
+              112
+          ],
+          "handle_name": "/WORK/GcdUnitDpathRTL_0x4d0fc71ead8d3d9e/a_mux$out",
+          "name": "a_mux$out"
+      },
+      {
+          "bits": [
+              69
+          ],
+          "handle_name": "/WORK/GcdUnitDpathRTL_0x4d0fc71ead8d3d9e/clk",
+          "name": "clk"
+      },
+      {
+          "bits": [
+              96
+          ],
+          "handle_name": "/WORK/GcdUnitDpathRTL_0x4d0fc71ead8d3d9e/is_a_lt_b",
+          "name": "is_a_lt_b"
+      },
+      {
+          "bits": [
+              23,
+              26,
+              27,
+              28,
+              29,
+              30,
+              34,
+              35,
+              38,
+              54,
+              59,
+              63,
+              74,
+              75,
+              80,
+              104
+          ],
+          "handle_name": "/WORK/GcdUnitDpathRTL_0x4d0fc71ead8d3d9e/a_reg$out",
+          "name": "a_reg$out"
+      },
+      {
+          "bits": [
+              32,
+              49,
+              51,
+              56,
+              66,
+              78,
+              87,
+              88,
+              89,
+              90,
+              91,
+              92,
+              94,
+              108,
+              109,
+              116
+          ],
+          "handle_name": "/WORK/GcdUnitDpathRTL_0x4d0fc71ead8d3d9e/b_reg$out",
+          "name": "b_reg$out"
+      },
+      {
+          "bits": [
+              39,
+              41,
+              42,
+              57,
+              65,
+              79,
+              98,
+              99,
+              101,
+              103,
+              105,
+              106,
+              110,
+              111,
+              113,
+              115
+          ],
+          "handle_name": "/WORK/GcdUnitDpathRTL_0x4d0fc71ead8d3d9e/req_msg_a",
+          "name": "req_msg_a"
+      },
+      {
+          "bits": [
+              8,
+              9,
+              10,
+              11,
+              12,
+              18,
+              20,
+              46,
+              61,
+              62,
+              93,
+              100,
+              107,
+              117,
+              118,
+              119
+          ],
+          "handle_name": "/WORK/GcdUnitDpathRTL_0x4d0fc71ead8d3d9e/req_msg_b",
+          "name": "req_msg_b"
+      },
+      {
+          "bits": [
+              58
+          ],
+          "handle_name": "/WORK/GcdUnitDpathRTL_0x4d0fc71ead8d3d9e/a_reg_en",
+          "name": "a_reg_en"
+      }
+  ],
+  "ports": [
+      {
+          "bits": [
+              96
+          ],
+          "direction": "output",
+          "handle_name": "is_a_lt_b",
+          "name": "is_a_lt_b"
+      },
+      {
+          "bits": [
+              95
+          ],
+          "direction": "input",
+          "handle_name": "b_reg_en",
+          "name": "b_reg_en"
+      },
+      {
+          "bits": [
+              86
+          ],
+          "direction": "input",
+          "handle_name": "b_mux_sel",
+          "name": "b_mux_sel"
+      },
+      {
+          "bits": [
+              97
+          ],
+          "direction": "output",
+          "handle_name": "is_b_zero",
+          "name": "is_b_zero"
+      },
+      {
+          "bits": [
+              60,
+              70
+          ],
+          "direction": "input",
+          "handle_name": "a_mux_sel",
+          "name": "a_mux_sel"
+      },
+      {
+          "bits": [
+              69
+          ],
+          "direction": "input",
+          "handle_name": "clk",
+          "name": "clk"
+      },
+      {
+          "bits": [
+              0,
+              1,
+              2,
+              3,
+              4,
+              5,
+              6,
+              7,
+              36,
+              40,
+              43,
+              67,
+              72,
+              77,
+              102,
+              114
+          ],
+          "direction": "output",
+          "handle_name": "resp_msg",
+          "name": "resp_msg"
+      },
+      {
+          "bits": [
+              8,
+              9,
+              10,
+              11,
+              12,
+              18,
+              20,
+              46,
+              61,
+              62,
+              93,
+              100,
+              107,
+              117,
+              118,
+              119
+          ],
+          "direction": "input",
+          "handle_name": "req_msg_b",
+          "name": "req_msg_b"
+      },
+      {
+          "bits": [
+              39,
+              41,
+              42,
+              57,
+              65,
+              79,
+              98,
+              99,
+              101,
+              103,
+              105,
+              106,
+              110,
+              111,
+              113,
+              115
+          ],
+          "direction": "input",
+          "handle_name": "req_msg_a",
+          "name": "req_msg_a"
+      },
+      {
+          "bits": [
+              58
+          ],
+          "direction": "input",
+          "handle_name": "a_reg_en",
+          "name": "a_reg_en"
+      }
+  ]
+}

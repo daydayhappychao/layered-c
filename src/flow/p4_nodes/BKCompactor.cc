@@ -112,7 +112,7 @@ void BKCompactor::placeBlock(std::shared_ptr<Node> &root, std::shared_ptr<BKAlig
                  * @todo
                  * 这里是瞎填的
                  */
-                double spacing = 100;
+                double spacing = 10;
                 if (bal->vdir == VDirection::UP) {
                     double currentBlockPosition = bal->y[root->getId()];
                     double newPosition = bal->y[neighborRoot->getId()] + bal->innerShift[neighbor->getId()] -
@@ -141,7 +141,7 @@ void BKCompactor::placeBlock(std::shared_ptr<Node> &root, std::shared_ptr<BKAlig
                  * @todo
                  * 这里是瞎填的
                  */
-                double spacing = 100;
+                double spacing = 10;
                 std::shared_ptr<ClassNode> sinkNode = getOrCreateClassNode(bal->sink[root->getId()], bal);
                 std::shared_ptr<ClassNode> neighborSink = getOrCreateClassNode(bal->sink[neighborRoot->getId()], bal);
                 if (bal->vdir == VDirection::UP) {

@@ -1,6 +1,7 @@
 #ifndef VECTOR_UTIL_HPP
 #define VECTOR_UTIL_HPP
 #include <algorithm>
+#include <cstddef>
 #include <optional>
 #include <vector>
 namespace GuiBridge {
@@ -30,6 +31,16 @@ std::optional<T> vecFind(const std::vector<T> &items, Predicate predicate) {
         return *it;  // 返回找到的元素
     }
     return std::nullopt;  // 未找到则返回 std::nullopt
+}
+
+template <typename T>
+int vecIndexOf(std::vector<T> &vec, const T &value) {
+    for (size_t i = 0; i < vec.size(); i++) {
+        if (vec[i] == value) {
+            return i;
+        }
+    }
+    return -1;
 }
 
 }  // namespace GuiBridge

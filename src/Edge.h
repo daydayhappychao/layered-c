@@ -43,7 +43,9 @@ public:
     // 该方法会修改原始数据，使数据与原始数据不一致，一定要记得在事后将数据修复回来
     void setDst(EdgeTarget &nextDst);
 
+    // 获取src坐标
     KVector getSrcPoint();
+    // 获取dst坐标
     KVector getDstPoint();
     KVectorChain &getBendPoints();
 

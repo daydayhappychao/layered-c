@@ -12,7 +12,6 @@
 #include "NodeProto.h"
 #include "Port.h"
 #include "Shape.h"
-#include "math/KVector.h"
 #include "nlohmann/json_fwd.hpp"
 
 namespace GuiBridge {
@@ -33,11 +32,14 @@ public:
     void addPort(std::string name, int id, PortType portType, int protoId);
     std::vector<std::shared_ptr<Port>> &getPorts() { return ports; };
     std::shared_ptr<Port> getPortById(int id);
+    void updateAllPortPos();
 
     // Node
 
     void addNode(const std::shared_ptr<Node> &node);
     void addNode(int id, int protoId, std::string name);
+    void addNode(int id, int protoId, std::string name, NodeSide side);
+    std::shared_ptr<Node> getNodeById(int id);
 
     // edge
 

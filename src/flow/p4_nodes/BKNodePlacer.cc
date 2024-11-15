@@ -51,7 +51,7 @@ void BKNodePlacer::process(std::shared_ptr<Graph> &layeredGraph) {
     if (chosenLayout == nullptr) {
         for (auto &bal : layouts) {
             if (checkOrderConstraint(layeredGraph, bal)) {
-                if (chosenLayout != nullptr || chosenLayout->layoutSize() > bal->layoutSize()) {
+                if (chosenLayout == nullptr || chosenLayout->layoutSize() > bal->layoutSize()) {
                     chosenLayout = bal;
                 }
             }

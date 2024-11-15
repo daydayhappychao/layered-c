@@ -1,6 +1,7 @@
 #include "EdgeToPloyLine.h"
 #include <algorithm>
 #include "../../Graph.h"
+#include "../../utils/randomUtil.h"
 
 namespace GuiBridge {
 void EdgeToPloyLine::process(std::shared_ptr<Graph> &graph) {
@@ -13,14 +14,17 @@ void EdgeToPloyLine::process(std::shared_ptr<Graph> &graph) {
             if (srcPoint.y == dstPoint.y) {
                 continue;
             }
-            edge->getBendPoints().add((srcPoint.x + dstPoint.x) / 2, srcPoint.y);
-            edge->getBendPoints().add((srcPoint.x + dstPoint.x) / 2, dstPoint.y);
+
+            float x = srcPoint.x + (dstPoint.x - srcPoint.x) / randomUtil->rangeFloat(2.0, 4.0);
+
+            edge->getBendPoints().add(x, srcPoint.y);
+            edge->getBendPoints().add(x, dstPoint.y);
         } else {
             edge->getBendPoints().add(srcPoint.x + 10, srcPoint.y);
             auto endPointY = std::max(edge->getSrc().node->getSize().y, edge->getDst().node->getSize().y) + 20;
             edge->getBendPoints().add(srcPoint.x + 10, endPointY);
-            edge->getBendPoints().add(dstPoint.x + 10, endPointY);
-            edge->getBendPoints().add(dstPoint.x + 10, dstPoint.y);
+            edge->getBendPoints().add(dstPoint.x - 10, endPointY);
+            edge->getBendPoints().add(dstPoint.x - 10, dstPoint.y);
         }
     }
 }

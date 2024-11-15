@@ -36,6 +36,7 @@ private:
     static void determineAllRightNeighbors(const std::shared_ptr<NeighborhoodInformation> &ni,
                                            const std::shared_ptr<Graph> &graph);
 
+    // 节点数量
     int nodeCount;
 };
 

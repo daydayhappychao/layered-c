@@ -69,19 +69,18 @@ std::vector<std::shared_ptr<Edge>> Node::getEdges() {
 
 std::vector<std::shared_ptr<Edge>> Node::getIncomingEdges() {
     std::vector<std::shared_ptr<Edge>> allEdges;
-    for (const auto &pair : edges) {
-        if (vecInclude(proto->inputPorts, pair.first)) {
-            allEdges.insert(allEdges.end(), pair.second.begin(), pair.second.end());
-        }
+
+    for (auto &port : getInputPorts()) {
+        auto edge = edges.at(port);
+        allEdges.insert(allEdges.end(), edge.begin(), edge.end());
     }
     return allEdges;
 };
 std::vector<std::shared_ptr<Edge>> Node::getOutgoingEdges() {
     std::vector<std::shared_ptr<Edge>> allEdges;
-    for (const auto &pair : edges) {
-        if (vecInclude(proto->outputPorts, pair.first)) {
-            allEdges.insert(allEdges.end(), pair.second.begin(), pair.second.end());
-        }
+    for (auto &port : getOutputPorts()) {
+        auto edge = edges.at(port);
+        allEdges.insert(allEdges.end(), edge.begin(), edge.end());
     }
     return allEdges;
 };
@@ -98,7 +97,9 @@ void Node::addEdge(std::shared_ptr<Port> &port, std::shared_ptr<Edge> &edge) {
     edges[port].emplace_back(edge);
 }
 
-void Node::removeEdge(std::shared_ptr<Port> &port, std::shared_ptr<Edge> &edge) { vecRemove(edges[port], edge); }
+void Node::removeEdge(std::shared_ptr<Port> &port, std::shared_ptr<Edge> &edge) { 
+    vecRemove(edges[port], edge); 
+}
 
 std::shared_ptr<Layer> &Node::getLayer() { return layer; }
 

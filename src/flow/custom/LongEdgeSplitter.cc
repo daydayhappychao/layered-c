@@ -30,14 +30,14 @@ std::shared_ptr<Node> LongEdgeSplitter::createDummyNode(std::shared_ptr<Graph> &
                                                         std::shared_ptr<Edge> &edgeToSplit) {
     auto dummyNodeProto = graph->getDummyNodeProto();
     auto dummyNode = std::make_shared<Node>("a_dummy_node", dummyNodeProto, 99999999 - graph->getNodes().size());
+    graph->addNode(dummyNode);
     dummyNode->setDummy(edgeToSplit);
     dummyNode->setLayer(targetLayer);
-    graph->addNode(dummyNode);
     return dummyNode;
 }
 
 void LongEdgeSplitter::splitEdge(std::shared_ptr<Graph> &graph, std::shared_ptr<Edge> &edge,
-                                                  std::shared_ptr<Node> &dummyNode) {
+                                 std::shared_ptr<Node> &dummyNode) {
     auto oldEdgeTarget = edge->getDst();
 
     auto inPort = graph->getPortById(-1);

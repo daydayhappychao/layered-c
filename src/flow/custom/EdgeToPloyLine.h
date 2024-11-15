@@ -1,5 +1,5 @@
+#pragma once
 #include <memory>
-#pragma on
 
 namespace GuiBridge {
 class Graph;

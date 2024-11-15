@@ -17,17 +17,9 @@ void LayerConstraintPostprocessor::process(std::shared_ptr<Graph> &graph) {
     if (!graph->getHiddenNodes().empty()) {
         auto firstSeparateLayer = std::make_shared<Layer>(graph);
         auto lastSeparateLayer = std::make_shared<Layer>(graph);
+        layers.insert(layers.begin(), firstSeparateLayer);
+        layers.emplace_back(lastSeparateLayer);
         restoreHiddenNodes(graph, firstSeparateLayer, lastSeparateLayer);
-        if (!firstSeparateLayer->getNodes().empty()) {
-            layers.insert(layers.begin(), firstSeparateLayer);
-        }
-
-        if (!lastSeparateLayer->getNodes().empty()) {
-            layers.emplace_back(lastSeparateLayer);
-        }
-    }
-    for (auto &edge : graph->getEdges()) {
-        edge->show();
     }
 }
 
@@ -64,6 +56,7 @@ void LayerConstraintPostprocessor::moveFirstAndLastNodes(std::shared_ptr<Graph> 
     }
 }
 
+// 将第一层和最后一层的节点放回图里，并且将它们的 Edge 恢复
 void LayerConstraintPostprocessor::restoreHiddenNodes(std::shared_ptr<Graph> &graph,
                                                       const std::shared_ptr<Layer> &firstSeparateLayer,
                                                       const std::shared_ptr<Layer> &lastSeparateLayer) {
@@ -71,9 +64,19 @@ void LayerConstraintPostprocessor::restoreHiddenNodes(std::shared_ptr<Graph> &gr
         switch (node->getSide()) {
             case NodeSide::FIRST_SEPARATE:
                 node->setLayer(firstSeparateLayer);
+                for (auto &edge : graph->getEdges()) {
+                    if (edge->getSrc().node == node) {
+                        edge->show();
+                    }
+                }
                 break;
             case NodeSide::LAST_SEPARATE:
                 node->setLayer(lastSeparateLayer);
+                for (auto &edge : graph->getEdges()) {
+                    if (edge->getDst().node == node) {
+                        edge->show();
+                    }
+                }
                 break;
             case NodeSide::FIRST:
             case NodeSide::LAST:

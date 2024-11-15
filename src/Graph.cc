@@ -11,6 +11,7 @@
 #include "NodeProto.h"
 #include "Port.h"
 #include "nlohmann/json.hpp"
+#include "opts/NodeSide.h"
 #include "utils/VectorUtil.h"
 
 namespace GuiBridge {
@@ -53,16 +54,35 @@ std::shared_ptr<Port> Graph::getPortById(int id) {
     return portPtrValue;
 };
 
+void Graph::updateAllPortPos() {
+    for (auto &proto : nodeProtos) {
+        proto->updatePortPos();
+    }
+}
+
 void Graph::addNode(const std::shared_ptr<Node> &node) {
     nodes.push_back(node);
     layerlessNodes.emplace_back(node);
-    auto ptr = shared_from_this();
 }
 void Graph::addNode(int id, int protoId, std::string name) {
     auto protoPtr = getProtoById(protoId);
     auto nodePtr = std::make_shared<Node>(name, protoPtr, id);
     addNode(nodePtr);
 }
+
+void Graph::addNode(int id, int protoId, std::string name, NodeSide side) {
+    auto protoPtr = getProtoById(protoId);
+    auto nodePtr = std::make_shared<Node>(name, protoPtr, id, side);
+    addNode(nodePtr);
+}
+
+std::shared_ptr<Node> Graph::getNodeById(int id) {
+    auto node = vecFind(nodes, [id](const std::shared_ptr<Node> &node) { return node->_id == id; });
+    if (!node.has_value()) {
+        throw std::runtime_error("根据 id 查询的 node 不存在");
+    }
+    return node.value();
+};
 
 void Graph::addEdge(std::shared_ptr<Edge> &edge) {
     auto portPtr = edge->getSrc().port;
