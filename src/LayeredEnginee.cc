@@ -155,6 +155,6 @@ void ELKLayered::printJson() {
         std::cerr << "无法打开文件" << std::endl;
     }
 
-    std::cout << res.dump() << std::endl;
+    // std::cout << res.dump() << std::endl;
 }
 }  // namespace GuiBridge

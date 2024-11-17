@@ -78,7 +78,7 @@ double BKAlignedLayout::checkSpaceAbove(std::shared_ptr<Node> &blockRoot, double
              * @todo
              *  这里的 100是我暂时瞎填的,包括下面的
              */
-            availableSpace = std::min(availableSpace, minYCurrent - (maxYNeighbor + 0));
+            availableSpace = std::min(availableSpace, minYCurrent - (maxYNeighbor + 10));
         }
 
     } while (rootNode != current);
@@ -97,7 +97,7 @@ double BKAlignedLayout::checkSpaceBelow(std::shared_ptr<Node> &blockRoot, double
         if (neighbor != nullptr) {
             double minYNeighbor = getMinY(neighbor);
 
-            availableSpace = std::min(availableSpace, minYNeighbor - (maxYCurrent + 0));
+            availableSpace = std::min(availableSpace, minYNeighbor - (maxYCurrent + 10));
         }
     } while (rootNode != current);
     return availableSpace;

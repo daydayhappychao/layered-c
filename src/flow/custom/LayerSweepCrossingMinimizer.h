@@ -34,9 +34,6 @@ public:
 private:
     std::vector<std::vector<int>> layerNodeIdPos;
 
-    // 左侧outputPort的列表
-    std::vector<std::vector<std::pair<int, int>>> layerLeftPortIdPos;
-    std::vector<std::vector<std::pair<int, int>>> layerRightPortIdPos;
 
     std::map<std::shared_ptr<Node>, std::shared_ptr<Neighbor>> neighborData;
 
@@ -44,5 +41,7 @@ private:
     void sortNodePort(std::shared_ptr<Graph> &graph);
 
     void syncNodePos(std::shared_ptr<Graph> &graph);
+
+    int getCrossCountByLeftLayerIndex(std::shared_ptr<Graph> &graph, int layerIndex);
 };
 }  // namespace GuiBridge

@@ -133,7 +133,7 @@ std::vector<std::vector<std::shared_ptr<Node>>> Graph::toNodeArray() {
 nlohmann::json Graph::json() {
     nlohmann::json res;
     for (auto &n : nodes) {
-        res['node'].emplace_back(n->json());
+        res["node"].emplace_back(n->json());
     }
     return res;
 };

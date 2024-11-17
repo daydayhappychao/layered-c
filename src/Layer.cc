@@ -3,6 +3,7 @@
 #include <cstddef>
 #include <utility>
 #include "Graph.h"
+#include "utils/Constants.h"
 namespace GuiBridge {
 Layer::Layer(std::shared_ptr<Graph> &graph) : owner(graph) {}
 
@@ -63,6 +64,6 @@ void Layer::adjustLayerAndNodePosX() {
     }
 }
 
-float Layer::getMargin() { return this->size.x / 2; }
+float Layer::getMargin() { return LAYER_MARGIN; }
 
 }  // namespace GuiBridge

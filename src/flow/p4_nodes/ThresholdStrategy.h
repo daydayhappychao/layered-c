@@ -5,6 +5,7 @@
 #include <queue>
 #include <set>
 #include <stack>
+#include <limits>
 
 namespace GuiBridge {
 class Node;

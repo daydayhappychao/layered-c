@@ -1,7 +1,10 @@
 #include "LayerSweepCrossingMinimizer.h"
 #include <algorithm>
 #include <cstddef>
+#include <cstdio>
+#include <iostream>
 #include <memory>
+#include <stdexcept>
 #include <utility>
 #include <vector>
 #include "../../Graph.h"
@@ -55,14 +58,16 @@ void LayerSweepCrossingMinimizer::process(std::shared_ptr<Graph> &graph) {
      * 2. 再确定 port 顺序
      */
     layerNodeIdPos.resize(graph->getLayers().size());
-    layerLeftPortIdPos.resize(graph->getLayers().size());
-    layerRightPortIdPos.resize(graph->getLayers().size());
     for (auto &node : graph->getNodes()) {
         auto neighbor = std::make_shared<Neighbor>(node, graph);
         neighborData[node] = neighbor;
     }
     sortLayerNode(graph);
     sortNodePort(graph);
+    for (int i = 0; i < graph->getLayers().size() - 1; i++) {
+        int crossCount = getCrossCountByLeftLayerIndex(graph, i);
+        printf("%i: %i\n", i, crossCount);
+    }
 }
 
 void LayerSweepCrossingMinimizer::sortLayerNode(std::shared_ptr<Graph> &graph) {
@@ -76,11 +81,16 @@ void LayerSweepCrossingMinimizer::sortLayerNode(std::shared_ptr<Graph> &graph) {
             std::vector<std::pair<int, int>> nodeBarycenters;
             for (auto &node : graph->getLayers()[i]->getNodes()) {
                 int barycenter = 0;
+                int activePortCount = 0;
                 for (auto &incomingEdges : node->getIncomingEdges()) {
                     int neighborNodeIndex = vecIndexOf(lastLayerNodeIdPos, incomingEdges->getSrc().node->_id);
                     if (neighborNodeIndex != -1) {
                         barycenter += neighborNodeIndex;
+                        activePortCount++;
                     }
+                }
+                if (barycenter > 0) {
+                    barycenter = barycenter / activePortCount;
                 }
                 nodeBarycenters.emplace_back(node->_id, barycenter);
                 neighborData.at(node)->barycenter = barycenter;
@@ -92,6 +102,30 @@ void LayerSweepCrossingMinimizer::sortLayerNode(std::shared_ptr<Graph> &graph) {
                 layerNodeIdPos[i].emplace_back(barycenter.first);
             }
         }
+    }
+    auto &lastLayerNodeIdPos = layerNodeIdPos[1];
+    std::vector<std::pair<int, int>> nodeBarycenters;
+    for (auto &node : graph->getLayers()[0]->getNodes()) {
+        int barycenter = 0;
+        int activePortCount = 0;
+        for (auto &outcomingEdge : node->getOutgoingEdges()) {
+            int neighborNodeIndex = vecIndexOf(lastLayerNodeIdPos, outcomingEdge->getDst().node->_id);
+            if (neighborNodeIndex != -1) {
+                barycenter += neighborNodeIndex;
+                activePortCount++;
+            }
+        }
+        if (barycenter > 0) {
+            barycenter = barycenter / activePortCount;
+        }
+        nodeBarycenters.emplace_back(node->_id, barycenter);
+        neighborData.at(node)->barycenter = barycenter;
+    }
+    std::sort(nodeBarycenters.begin(), nodeBarycenters.end(),
+              [](const std::pair<int, int> &v1, const std::pair<int, int> &v2) { return v1.second < v2.second; });
+    layerNodeIdPos[0].clear();
+    for (auto &barycenter : nodeBarycenters) {
+        layerNodeIdPos[0].emplace_back(barycenter.first);
     }
     syncNodePos(graph);
 }
@@ -178,6 +212,58 @@ void LayerSweepCrossingMinimizer::sortNodePort(std::shared_ptr<Graph> &graph) {
         }
     }
     graph->updateAllPortPos();
+}
+
+int LayerSweepCrossingMinimizer::getCrossCountByLeftLayerIndex(std::shared_ptr<Graph> &graph, int layerIndex) {
+    if (layerIndex + 1 > graph->getLayers().size() - 1) {
+        throw std::runtime_error("layerIndex 不合法");
+    }
+    int crossCount = 0;
+    auto &leftLayer = graph->getLayers()[layerIndex];
+    auto &rightLayer = graph->getLayers()[layerIndex + 1];
+
+    std::vector<std::pair<int, int>> leftPortIdPos;
+    std::vector<std::pair<int, int>> rightPortIdPos;
+    // 从left连接到right layer 的edge
+    std::vector<std::shared_ptr<Edge>> inLayerEdges;
+    // 这些 edge 连接的 port 在 layer 中的 index 的对照
+    std::vector<std::pair<int, int>> inLayerEdgePortPos;
+
+    for (auto &node : leftLayer->getNodes()) {
+        for (auto &port : node->getOutputPorts()) {
+            leftPortIdPos.emplace_back(node->_id, port->_id);
+        }
+    }
+
+    for (auto &node : rightLayer->getNodes()) {
+        for (auto &port : node->getInputPorts()) {
+            rightPortIdPos.emplace_back(node->_id, port->_id);
+        }
+    }
+
+    for (auto &edge : graph->getEdges()) {
+        if (edge->getSrc().node->getLayer() == leftLayer && edge->getDst().node->getLayer() == rightLayer) {
+            inLayerEdges.emplace_back(edge);
+            std::pair<int, int> leftData = std::make_pair(edge->getSrc().node->_id, edge->getSrc().port->_id);
+            std::pair<int, int> rightData = std::make_pair(edge->getDst().node->_id, edge->getDst().port->_id);
+            int leftIndex = vecIndexOf(leftPortIdPos, leftData);
+            int rightIndex = vecIndexOf(rightPortIdPos, rightData);
+            inLayerEdgePortPos.emplace_back(leftIndex, rightIndex);
+        }
+    }
+
+    for (int i = 0; i < inLayerEdgePortPos.size() - 1; i++) {
+        for (int j = i + 1; j < inLayerEdgePortPos.size(); j++) {
+            auto iItem = inLayerEdgePortPos[i];
+            auto jItem = inLayerEdgePortPos[j];
+            if (iItem.first > jItem.first && iItem.second < jItem.second) {
+                crossCount++;
+            } else if (iItem.first < jItem.first && iItem.second > jItem.second) {
+                crossCount++;
+            }
+        }
+    }
+    return crossCount;
 }
 
 }  // namespace GuiBridge
