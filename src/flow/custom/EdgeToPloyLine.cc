@@ -6,6 +6,7 @@
 #include <memory>
 #include <optional>
 #include <utility>
+#include <valarray>
 #include <vector>
 #include "../../Graph.h"
 #include "../../utils/Constants.h"
@@ -51,6 +52,9 @@ void EdgeToPloyLine::process(std::shared_ptr<Graph> &graph) {
                 }
 
                 for (auto &edge : positiveEdges) {
+                    if (!edge->getBendPoints().empty()) {
+                        continue;
+                    }
                     auto srcPoint = edge->getSrcPoint();
                     auto dstPoint = edge->getDstPoint();
                     if (alreadyBendPoints.empty()) {
@@ -63,32 +67,35 @@ void EdgeToPloyLine::process(std::shared_ptr<Graph> &graph) {
                 }
 
                 for (auto &edge : reverseEdges) {
+                    if (!edge->getBendPoints().empty()) {
+                        continue;
+                    }
                     int leftX;
                     int rightX;
                     if (edge->getSrc().port == port) {
-                        int idx = vecIndexOf(graph->getLayers(), edge->getDst().node->getLayer());
-                        leftX = layerGapPos[i].applyNewXRight() + layer->getPos().x + layer->getSize().x;
-                        rightX = layerGapPos[idx].applyNewXLeft() + graph->getLayers()[idx]->getPos().x +
-                                 graph->getLayers()[idx]->getSize().x;
+                        int leftIdx = vecIndexOf(graph->getLayers(), edge->getDst().node->getLayer()) - 1;
+                        rightX = layerGapPos[i].applyNewXLeft() + layer->getPos().x + layer->getSize().x;
+                        leftX = layerGapPos[leftIdx].applyNewXRight() + graph->getLayers()[leftIdx]->getPos().x +
+                                graph->getLayers()[leftIdx]->getSize().x;
                     } else {
-                        int idx = vecIndexOf(graph->getLayers(), edge->getSrc().node->getLayer());
-                        leftX = layerGapPos[idx].applyNewXRight() + graph->getLayers()[idx]->getPos().x +
-                                graph->getLayers()[idx]->getSize().x;
-                        rightX = (nextX != 0)
-                                     ? nextX
-                                     : (layerGapPos[i].applyNewXLeft() + layer->getPos().x + layer->getSize().x);
+                        int leftIdx = i - 1;
+                        int rightIdx = vecIndexOf(graph->getLayers(), edge->getSrc().node->getLayer());
+                        leftX = layerGapPos[leftIdx].applyNewXRight() + graph->getLayers()[leftIdx]->getPos().x +
+                                graph->getLayers()[leftIdx]->getSize().x;
+                        rightX = layerGapPos[rightIdx].applyNewXLeft() + graph->getLayers()[rightIdx]->getPos().x +
+                                 graph->getLayers()[rightIdx]->getSize().x;
                     }
 
-                    auto startPoint = KVector(edge->getSrcPoint());
+                    auto startPoint = (edge->getSrcPoint());
                     startPoint.setX(leftX);
-                    auto endPoint = KVector(edge->getDstPoint());
+                    auto endPoint = (edge->getDstPoint());
                     endPoint.setX(rightX);
                     int y = LayerGapPosManage::applyMinCrossY(edge->getSrcPoint(), edge->getDstPoint(), graph);
 
-                    edge->getBendPoints().add(leftX, edge->getSrcPoint().y);
-                    edge->getBendPoints().add(leftX, y);
+                    edge->getBendPoints().add(rightX, edge->getSrcPoint().y);
                     edge->getBendPoints().add(rightX, y);
-                    edge->getBendPoints().add(rightX, edge->getDstPoint().y);
+                    edge->getBendPoints().add(leftX, y);
+                    edge->getBendPoints().add(leftX, edge->getDstPoint().y);
                 }
             }
         }
@@ -171,6 +178,7 @@ int LayerGapPosManage::applyMinCrossY(const KVector &startPoint, const KVector &
         auto lastPoint = edge->getSrcPoint();
         for (auto &bendPoint : edge->getBendPoints()) {
             edgesPos.emplace_back(lastPoint, bendPoint);
+            lastPoint = bendPoint;
         }
         edgesPos.emplace_back(lastPoint, edge->getDstPoint());
     }
@@ -182,12 +190,20 @@ int LayerGapPosManage::applyMinCrossY(const KVector &startPoint, const KVector &
         int crossCount;
         bool nodeIntersection = false;
         for (auto &nodePos : nodesPos) {
-            if (nextY > nodePos.first.y && nextY < nodePos.first.y + nodePos.second.y) {
+            if (nextY > nodePos.first.y - LINE_GAP && nextY < nodePos.first.y + nodePos.second.y + LINE_GAP) {
                 nodeIntersection = true;
                 nextY = nodePos.first.y + nodePos.second.y;
                 break;
             }
         }
+
+        for (auto &edge : edgesPos) {
+            if (edge.first.y == edge.second.y && (std::abs(edge.first.y - nextY) < LINE_GAP)) {
+                nodeIntersection = true;
+                break;
+            }
+        }
+
         if (nodeIntersection) {
             continue;
         }
