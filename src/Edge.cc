@@ -4,6 +4,7 @@
 #include <stdexcept>
 #include <utility>
 
+#include "Layer.h"
 #include "Node.h"
 #include "Port.h"
 #include "math/KVectorChain.h"

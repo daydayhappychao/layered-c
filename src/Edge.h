@@ -1,11 +1,14 @@
 #ifndef EDGE_HPP
 #define EDGE_HPP
 
+#include <functional>
 #include <memory>
 #include <optional>
 #include <string>
 #include <utility>
 
+#include "./Node.h"
+#include "./Port.h"
 #include "math/KVector.h"
 #include "math/KVectorChain.h"
 #include "nlohmann/json_fwd.hpp"
@@ -27,6 +30,19 @@ struct EdgeTarget {
 
     // 复制构造函数
     EdgeTarget(const EdgeTarget &other) = default;
+
+    // 定义相等运算符
+    bool operator==(const EdgeTarget &other) const {
+        return node->_id == other.node->_id && port->_id == other.port->_id;
+    }
+};
+
+struct EdgeTargetHash {
+    size_t operator()(const EdgeTarget &target) const {
+        size_t hash_node = std::hash<int>{}(target.node->_id);
+        size_t hash_port = std::hash<int>{}(target.port->_id);
+        return hash_node ^ (hash_port << 1);  // Combine the hashes
+    }
 };
 
 class Edge : public std::enable_shared_from_this<Edge> {

@@ -1,5 +1,4 @@
-#ifndef HYPER_EDGE_SEGMENT_SPLITTER_HPP
-#define HYPER_EDGE_SEGMENT_SPLITTER_HPP
+#pragma once
 
 #include <memory>
 #include <unordered_set>
@@ -57,5 +56,3 @@ private:
     static double center(double p1, double p2);
 };
 }  // namespace GuiBridge
-
-#endif

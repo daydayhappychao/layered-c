@@ -8,6 +8,8 @@ const int THOROUGHNESS = 7;
 const int REMOVE_SUBTREES_THRESH = 40;
 
 const int LAYER_MARGIN = 50;
-const int LINE_GAP = 5;
+const float EDGE_EDGE_GAP = 10.0;
+const float EDGE_NODE_GAP = 14.0;
+const float NODE_NODE_GAP = 20.0;
 }  // namespace GuiBridge
 #endif

@@ -4,6 +4,7 @@
 #include <utility>
 #include "Graph.h"
 #include "utils/Constants.h"
+#include "utils/VectorUtil.h"
 namespace GuiBridge {
 Layer::Layer(std::shared_ptr<Graph> &graph) : owner(graph) {}
 
@@ -49,11 +50,12 @@ void Layer::adjustLayerAndNodePosX() {
         auto &layer = owner->getLayers()[i];
         auto &lastLayer = owner->getLayers()[i - 1];
         if (i != 0) {
-            layerX += layer->getMargin() + lastLayer->getMargin() + lastLayer->getSize().x;
+            layerX += layer->getMargin();
         }
         if (thisPtr == layer) {
             break;
         }
+        layerX += layer->size.x;
     }
 
     this->getPos().setX(layerX);
@@ -64,6 +66,28 @@ void Layer::adjustLayerAndNodePosX() {
     }
 }
 
-float Layer::getMargin() { return LAYER_MARGIN; }
+float Layer::getMargin() { return margin; }
+
+void Layer::setMargin(float v) {
+    margin = v;
+    adjustLayerAndNodePosX();
+};
+
+std::shared_ptr<Layer> Layer::getRightLayer() {
+    auto &layers = owner->getLayers();
+    int currentIndex = vecIndexOf(layers, shared_from_this());
+    if (layers.size() > currentIndex + 1) {
+        return layers[currentIndex + 1];
+    }
+    return nullptr;
+};
+std::shared_ptr<Layer> Layer::getLeftLayer() {
+    auto &layers = owner->getLayers();
+    int currentIndex = vecIndexOf(layers, shared_from_this());
+    if (currentIndex > 0) {
+        return layers[currentIndex - 1];
+    }
+    return nullptr;
+};
 
 }  // namespace GuiBridge

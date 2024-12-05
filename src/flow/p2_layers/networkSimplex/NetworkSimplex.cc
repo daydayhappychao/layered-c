@@ -134,6 +134,9 @@ void NetworkSimplex::feasibleTree() {
         std::fill(edgeVisited.begin(), edgeVisited.end(), false);
         while (tightTreeDFS(graph->getLayerlessNodes().front()) < graph->getLayerlessNodes().size()) {
             auto e = minimalSlack();
+            if (e == nullptr) {
+                break;
+            }
             int slack = e->getDst().node->layerIndex - e->getSrc().node->layerIndex - e->delta;
 
             if (e->getDst().node->treeNode) {

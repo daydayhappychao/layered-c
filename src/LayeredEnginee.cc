@@ -25,6 +25,7 @@
 #include "flow/intermediate/LayerConstraintPreprocessor.h"
 #include "flow/intermediate/LayerSizeAndGraphHeightCalculator.h"
 #include "flow/p2_layers/networkSimplex/NetworkSimplexLayerer.h"
+#include "flow/p5_edges/OrthogonalEdgeRouter.h"
 #include "opts/NodeSide.h"
 #include "opts/PortType.h"
 
@@ -115,6 +116,10 @@ void ELKLayered::layered() {
     layerSizeAndGraphHeightCalculator.process(graph);
 
     // p5 edge routing
+
+    OrthogonalEdgeRouter orthogonalEdgeRouter;
+    orthogonalEdgeRouter.process(graph);
+
     for (auto &edge : graph->getEdges()) {
         edge->show();
     }

@@ -7,9 +7,9 @@ namespace GuiBridge {
 class HyperEdgeSegment;
 
 enum class DependencyType { REGULAR, CRITICAL };
-class HyperEdgeSegmentDependency {
+const int CRITICAL_DEPENDENCY_WEIGHT = 1;
+class HyperEdgeSegmentDependency : public std::enable_shared_from_this<HyperEdgeSegmentDependency> {
 public:
-    static const int CRITICAL_DEPENDENCY_WEIGHT = 1;
     HyperEdgeSegmentDependency(DependencyType type, std::shared_ptr<HyperEdgeSegment> &source,
                                std::shared_ptr<HyperEdgeSegment> &target, int weight);
     static std::shared_ptr<HyperEdgeSegmentDependency> createAndAddRegular(std::shared_ptr<HyperEdgeSegment> &source,
@@ -25,7 +25,6 @@ public:
     std::shared_ptr<HyperEdgeSegment> getTarget() const;
     void setTarget(std::shared_ptr<HyperEdgeSegment> &newTarget);
     int getWeight() const;
-    std::string toString() const;
 
 private:
     DependencyType type;

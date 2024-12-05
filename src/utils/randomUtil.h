@@ -1,5 +1,4 @@
-#ifndef RANDOM_UTIL_HPP
-#define RANDOM_UTIL_HPP
+#pragma once
 
 #include <random>
 namespace GuiBridge {
@@ -15,11 +14,15 @@ public:
         double random_number = dist(rng);
         return random_number;
     }
+    int rangeInt(int start, int end) {
+        std::uniform_real_distribution<> dist(start, end);
+        int random_number = dist(rng);
+        return random_number;
+    }
 
 private:
     std::mt19937 rng;
 };
-}  // namespace GuiBridge
+extern std::unique_ptr<RandomUtil> randomUtil;
 
-auto randomUtil = new GuiBridge::RandomUtil();
-#endif
+}  // namespace GuiBridge

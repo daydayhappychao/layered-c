@@ -3,23 +3,28 @@
 
 #include <list>
 #include <map>
+#include <memory>
+#include <unordered_map>
 #include <vector>
+#include "OrthogonalRoutingGenerator.h"
 
 namespace GuiBridge {
 
 class Port;
+class Node;
 class WestToEastRoutingStrategy;
 class HyperEdgeSegmentDependency;
+class EdgeTarget;
 
 class HyperEdgeSegment : public std::enable_shared_from_this<HyperEdgeSegment> {
 public:
     explicit HyperEdgeSegment(std::shared_ptr<WestToEastRoutingStrategy> &routingStrategy);
 
-    void addPortPositions(std::shared_ptr<Port> &port,
-                          std::map<std::shared_ptr<Port>, std::shared_ptr<HyperEdgeSegment>> &hyperEdgeSegmentMap);
-    std::list<double> getIncomingConnectionCoordinates();
-    std::list<double> getOutgoingConnectionCoordinates();
-    std::vector<std::shared_ptr<Port>> getPorts();
+    void addPortPositions(std::shared_ptr<Node> &node, std::shared_ptr<Port> &port,
+                          PortToEdgeSegmentMap &hyperEdgeSegmentMap);
+    std::vector<double> getIncomingConnectionCoordinates();
+    std::vector<double> getOutgoingConnectionCoordinates();
+    std::vector<EdgeTarget> getPorts();
     int getRoutingSlot();
     void setRoutingSlot(int slot);
     double getStartCoordinate();
@@ -44,21 +49,20 @@ public:
     void recomputeExtent();
     std::pair<std::shared_ptr<HyperEdgeSegment>, std::shared_ptr<HyperEdgeSegment>> simulateSplit();
     std::shared_ptr<HyperEdgeSegment> splitAt(double splitPosition);
-    int compareTo(std::shared_ptr<HyperEdgeSegment> &other);
-    bool equals(std::shared_ptr<HyperEdgeSegment> &other);
+
+    int mark;
 
 private:
-    static void insertSorted(std::list<double> &list, double value);
-    void recomputeExtent(std::list<double> &positions);
+    static void insertSorted(std::vector<double> &list, double value);
+    void recomputeExtent(std::vector<double> &positions);
 
     std::shared_ptr<WestToEastRoutingStrategy> routingStrategy;
-    std::vector<std::shared_ptr<Port>> ports;
-    int mark;
+    std::vector<EdgeTarget> ports;
     int routingSlot;
     double startPosition;
     double endPosition;
-    std::list<double> incomingConnectionCoordinates;
-    std::list<double> outgoingConnectionCoordinates;
+    std::vector<double> incomingConnectionCoordinates;
+    std::vector<double> outgoingConnectionCoordinates;
     std::vector<std::shared_ptr<HyperEdgeSegmentDependency>> outgoingSegmentDependencies;
     int outDepWeight;
     int criticalOutDepWeight;
